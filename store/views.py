@@ -4,13 +4,16 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.mail import EmailMultiAlternatives # <-- Put it here!
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 from .models import Product, Order, OrderItem
-from .forms import ProductForm
-
+from .forms import ProductForm, CustomUserCreationForm
 # ==========================================
 # 1. STOREFRONT VIEWS
 # ==========================================
@@ -126,19 +129,23 @@ def checkout(request):
 # 4. USER AUTHENTICATION VIEWS
 # ==========================================
 
-from django import forms
+
+from .forms import ProductForm, CustomUserCreationForm # Import the new form
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        # Use the custom form here
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
+            messages.success(request, "Account created successfully!")
             return redirect('shop')
     else:
-        form = UserCreationForm()
-        # Add CSS classes to the default form fields
+        form = CustomUserCreationForm()
+        # Add CSS classes to the fields
         form.fields['username'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Choose a username'})
+        form.fields['email'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Enter your email'})
         form.fields['password1'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Create a password'})
         form.fields['password2'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Confirm password'})
         
@@ -242,31 +249,24 @@ def confirm_payment_and_send_invoice(request, order_id):
     order.is_paid = True
     order.save()
 
-    # 2. Send the Invoice Email
+    # 2. Prepare the Email
     subject = f"Payment Confirmed - Invoice for Order #{order.id}"
-    body = f"""
-    Hi {order.first_name},
     
-    We have received your payment of ₹{order.total_price}. Your order is now confirmed!
+    # Render the HTML invoice template (we will create this next)
+    html_message = render_to_string('store/email_invoice.html', {'order': order})
+    plain_message = strip_tags(html_message) # Fallback for old email clients
     
-    Order Details:
-    Order ID: #{order.id}
-    Payment Method: {order.payment_method}
-    
-    We will ship your items shortly.
-    
-    Thank you for shopping with Mini Mart!
-    """
-    
-    email = EmailMessage(
+    # 3. Send the Email
+    email = EmailMultiAlternatives(
         subject,
-        body,
-        'your_email@gmail.com', # Replace with your email
-        [order.email],          # Sends to the customer
+        plain_message,
+        'adnan.uc3m@gmail.com', # <-- REPLACE WITH YOUR REAL EMAIL
+        [order.email],
     )
+    email.attach_alternative(html_message, "text/html")
     email.send()
 
-    messages.success(request, f"Invoice sent to {order.email}!")
+    messages.success(request, f"Invoice email sent successfully to {order.email}!")
     return redirect('manage_orders')
 def order_success(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -282,3 +282,34 @@ def order_success(request, order_id):
 
     # Show the invoice for COD
     return render(request, 'store/success.html', {'order': order})
+
+def update_cart(request, product_id, action):
+    cart = request.session.get('cart', {})
+    product_id = str(product_id)
+    
+    if action == 'increase':
+        cart[product_id] = cart.get(product_id, 0) + 1
+    elif action == 'decrease':
+        cart[product_id] = cart.get(product_id, 0) - 1
+        if cart[product_id] <= 0:
+            del cart[product_id]
+            
+    request.session['cart'] = cart
+    return redirect('cart_detail')
+
+@login_required(login_url='/login/')
+def my_orders(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'store/my_orders.html', {'orders': orders})
+
+@login_required(login_url='/login/')
+def order_invoice(request, order_id):
+    # Get the order, but ensure it belongs to the logged-in user
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    
+    # If it's not paid, don't let them see the final invoice
+    if not order.is_paid:
+        messages.warning(request, "Payment is still pending verification.")
+        return redirect('my_orders')
+        
+    return render(request, 'store/invoice.html', {'order': order})

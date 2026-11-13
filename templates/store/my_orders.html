@@ -1,0 +1,77 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="container" style="max-width: 900px; margin-top: 40px; margin-bottom: 60px;">
+    <h2 style="color: #1f2937; margin-bottom: 30px;">My Orders</h2>
+    
+    {% for order in orders %}
+    <div style="background: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #e5e7eb; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+        
+        <!-- Order Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f3f4f6; padding-bottom: 15px; margin-bottom: 15px;">
+            <div>
+                <h3 style="margin: 0 0 5px 0; color: #1f2937;">Order #{{ order.id }}</h3>
+                <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Placed on {{ order.created_at|date:"M d, Y" }}</p>
+            </div>
+            <div style="text-align: right;">
+                <h4 style="margin: 0 0 5px 0;">₹{{ order.total_price }}</h4>
+                {% if order.is_paid %}
+                    <span style="background: #d1fae5; color: #065f46; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">✓ Confirmed</span>
+                {% else %}
+                    <span style="background: #fef3c7; color: #92400e; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">⏳ Pending Verification</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Order Details (Address, Email, Phone) -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <p style="margin: 0 0 5px 0; color: #6b7280; font-size: 0.85rem; font-weight: bold; text-transform: uppercase;">Delivery Details</p>
+                <p style="margin: 0; color: #374151;">{{ order.first_name }} {{ order.last_name }}</p>
+                <p style="margin: 0; color: #374151;">{{ order.address }}, {{ order.city }} - {{ order.pincode }}</p>
+            </div>
+            <div>
+                <p style="margin: 0 0 5px 0; color: #6b7280; font-size: 0.85rem; font-weight: bold; text-transform: uppercase;">Contact Info</p>
+                <p style="margin: 0; color: #374151;">📧 {{ order.email }}</p>
+                <p style="margin: 0; color: #374151;">💳 {{ order.payment_method }}</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="border-top: 1px solid #f3f4f6; padding-top: 15px; display: flex; gap: 15px;">
+            {% if order.is_paid %}
+                <!-- Button to view Invoice (Only shows if Paid) -->
+                <a href="{% url 'order_invoice' order.id %}" style="background: #0f9d58; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">
+                    📄 View Invoice / Download PDF
+                </a>
+            {% else %}
+                <p style="margin: 0; color: #92400e; font-size: 0.9rem; font-weight: 500;">
+                                {% if order.is_paid %}
+                <!-- Button to view Invoice (Only shows if Paid) -->
+                <a href="{% url 'order_invoice' order.id %}" style="background: #0f9d58; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">
+                    📄 View Invoice / Download PDF
+                </a>
+            {% else %}
+                <!-- NEW: WhatsApp Help Button for Pending Orders -->
+                <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
+                    <p style="margin: 0; color: #92400e; font-size: 0.9rem; font-weight: 500;">
+                        We are verifying your payment.
+                    </p>
+                    <a href="https://wa.me/917564820314?text=Hi%20Mini%20Mart,%20I%20need%20help%20with%20the%20payment%20verification%20for%20Order%20%23{{ order.id }}" 
+                       target="_blank" 
+                       style="background: #25D366; color: white; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85rem; display: flex; align-items: center; gap: 5px;">
+                        💬 Chat to Verify
+                    </a>
+                </div>
+            {% endif %}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div style="text-align: center; padding: 50px; background: white; border-radius: 12px;">
+        <h3 style="color: #6b7280;">You haven't placed any orders yet.</h3>
+        <a href="/" style="color: #0f9d58; font-weight: bold;">Start Shopping</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

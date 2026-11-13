@@ -29,9 +29,12 @@ urlpatterns = [
     path('dashboard/products/edit/<int:product_id>/', views.edit_product, name='edit_product'),
     path('dashboard/products/delete/<int:product_id>/', views.delete_product, name='delete_product'),
     path('dashboard/customers/', views.manage_customers, name='manage_customers'),
+    path('cart/update/<int:product_id>/<str:action>/', views.update_cart, name='update_cart'),
     
     # Order Management
     path('dashboard/orders/', views.manage_orders, name='manage_orders'),
     path('dashboard/orders/confirm/<int:order_id>/', views.confirm_payment_and_send_invoice, name='confirm_payment'),
+    path('my-orders/', views.my_orders, name='my_orders'),
+    path('my-orders/invoice/<int:order_id>/', views.order_invoice, name='order_invoice'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

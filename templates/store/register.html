@@ -5,7 +5,6 @@
 <div style="max-width: 450px; margin: 60px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
     <h2 style="text-align: center; margin-bottom: 30px; color: #1f2937;">Create an Account</h2>
     
-    <!-- Display global form errors (if any) -->
     {% if form.non_field_errors %}
         <div style="background: #fee2e2; color: #dc2626; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem;">
             {{ form.non_field_errors.0 }}
@@ -27,6 +26,18 @@
             {% endif %}
         </div>
 
+        <!-- EMAIL FIELD (NEW) -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Email Address</label>
+            <input type="email" name="email" required 
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box; font-size: 1rem;"
+                   placeholder="you@example.com"
+                   value="{{ form.email.value|default:'' }}">
+            {% if form.email.errors %}
+                <p style="color: #dc2626; font-size: 0.85rem; margin-top: 5px;">{{ form.email.errors.0 }}</p>
+            {% endif %}
+        </div>
+
         <!-- Password Field -->
         <div style="margin-bottom: 20px;">
             <label style="display: block; margin-bottom: 8px; font-weight: 600;">Password</label>
@@ -36,13 +47,6 @@
             {% if form.password1.errors %}
                 <p style="color: #dc2626; font-size: 0.85rem; margin-top: 5px;">{{ form.password1.errors.0 }}</p>
             {% endif %}
-            
-            <!-- Clean help text -->
-            <ul style="font-size: 0.8rem; color: #6b7280; margin-top: 10px; padding-left: 20px;">
-                <li>At least 8 characters.</li>
-                <li>Cannot be entirely numeric.</li>
-                <li>Cannot be too similar to your username.</li>
-            </ul>
         </div>
 
         <!-- Confirm Password Field -->

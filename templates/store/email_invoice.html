@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f3f4f6; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; border-top: 5px solid #0f9d58; }
+        h1 { color: #0f9d58; margin-top: 0; }
+        .header { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; }
+        .total { text-align: right; font-size: 18px; font-weight: bold; margin-top: 20px; }
+        .btn { display: inline-block; padding: 12px 24px; background: #0f9d58; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Payment Confirmed ✅</h1>
+            <p>Hi {{ order.first_name }},</p>
+            <p>Great news! We have received your payment of <strong>₹{{ order.total_price }}</strong> for Order <strong>#{{ order.id }}</strong>.</p>
+        </div>
+
+        <h3>Order Summary:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="total">
+            Total Paid: ₹{{ order.total_price }}
+        </div>
+
+        <p style="margin-top: 30px;">We will notify you once your order has been shipped.</p>
+        <p>Thank you for shopping with Mini Mart!</p>
+        
+        <a href=https://mart-q2d5.onrender.com/orders/{{ order.id }}/" class="btn">View Order in Store</a>
+    </div>
+</body>
+</html>

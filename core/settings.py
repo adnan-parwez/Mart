@@ -132,3 +132,17 @@ MAILERS = {
 # --- CUSTOM SETTINGS ---
 UPI_ID = "parwez.adnan@ybl"  # <--- REPLACE WITH YOUR REAL UPI ID (e.g., 9876543210@ybl)
 UPI_NAME = "Adnan Parwez"
+
+# New Django 6.1 Email Configuration
+MAILERS = {
+    "default": {
+        "BACKEND": "django.core.mail.backends.smtp.EmailBackend",
+        "OPTIONS": {
+            "host": "smtp.gmail.com",
+            "port": 587,
+            "username": "adnan.uc3m@gmail.com",      # <-- Your Gmail
+            "password": "lqna jsbk mtiv ajyk",       # <-- Your 16-letter App Password
+            "use_tls": True,
+        },
+    },
+}

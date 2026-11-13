@@ -7,6 +7,7 @@ class Product(models.Model):
     category = models.CharField(max_length=100, blank=True)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
     description = models.TextField(blank=True)
+    stock = models.IntegerField(default=10)
 
     def __str__(self):
         return self.name

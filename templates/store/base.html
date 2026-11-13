@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>{% block title %}Mini Mart{% endblock %}</title>
     <style>
-        /* Base styles (keep your existing styles here) */
+        /* Base styles */
         :root { --primary: #0f9d58; --bg: #f3f4f6; --text: #1f2937; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; min-height: 100vh; }
         
@@ -31,8 +31,20 @@
         .category-bar a:hover { color: var(--primary); border-bottom-color: var(--primary); }
 
         .container { max-width: 1400px; margin: 40px auto; padding: 0 5%; flex: 1; width: 100%; box-sizing: border-box; }
+
+        /* Modal Animation */
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
+<body>
+        <!-- Free Delivery Banner -->
+    <div style="background: #0f9d58; color: white; text-align: center; padding: 8px; font-size: 0.9rem; font-weight: 600;">
+        🚚 Free Delivery on orders over ₹500!
+    </div>
+
     <!-- POPUP MODAL FOR LOGIN/SIGNUP -->
     {% if not user.is_authenticated %}
     <div id="welcome-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
@@ -55,15 +67,7 @@
         </div>
     </div>
 
-    <style>
-        @keyframes popIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-    </style>
-
     <script>
-        // Check if the user has already dismissed the popup in this session
         document.addEventListener("DOMContentLoaded", function() {
             if (!sessionStorage.getItem('popup_dismissed')) {
                 document.getElementById('welcome-modal').style.display = 'flex';
@@ -72,17 +76,29 @@
 
         function closeModal() {
             document.getElementById('welcome-modal').style.display = 'none';
-            // Remember that they dismissed it so it doesn't show on every page click
             sessionStorage.setItem('popup_dismissed', 'true');
         }
     </script>
     {% endif %}
 
-</body>
-</html>
-
-<body>
-
+    <!-- Custom Pop-up Toast -->
+    {% if messages %}
+    <div id="toast" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 15px 30px; border-radius: 50px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-weight: bold; z-index: 9999; display: flex; align-items: center; gap: 10px; animation: slideDown 0.4s ease-out;">
+        <span>🛒</span> {{ messages.0 }}
+    </div>
+    <style>
+        @keyframes slideDown {
+            from { top: -50px; opacity: 0; }
+            to { top: 20px; opacity: 1; }
+        }
+    </style>
+    <script>
+        setTimeout(() => {
+            let toast = document.getElementById('toast');
+            if (toast) toast.style.display = 'none';
+        }, 2500); // Disappears after 2.5 seconds
+    </script>
+    {% endif %}
     <!-- Main Navbar -->
     <nav class="navbar">
         <a href="/" class="logo">🛒 MiniMart</a>
@@ -95,11 +111,11 @@
         <!-- Right Side Actions -->
         <div class="nav-actions">
             {% if user.is_authenticated %}
-                <!-- Only show this if the user is an Admin/Staff -->
                 {% if user.is_staff %}
                     <a href="/dashboard/" style="color: #0f9d58; font-weight: bold;">Admin Dashboard</a>
                 {% endif %}
                 
+                <a href="/my-orders/" style="color: #6b7280; font-weight: 600;">My Orders</a>
                 <span style="color: #6b7280; font-weight: 600;">Hi, {{ user.username }}</span>
                 <a href="/logout/" style="color: #ef4444;">Logout</a>
             {% else %}
@@ -107,7 +123,16 @@
                 <a href="/register/">Sign Up</a>
             {% endif %}
             
-            <a href="/cart/" class="btn-cart">Cart 🛍️</a>
+            <a href="/cart/" class="btn-cart" style="position: relative;">Cart 🛍️ 
+    <!-- Calculate total items in cart -->
+    {% with total_items=request.session.cart|length %}
+        {% if total_items > 0 %}
+            <span style="position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; font-weight: bold; border: 2px solid white;">
+                {{ total_items }}
+            </span>
+        {% endif %}
+    {% endwith %}
+</a>
         </div>
     </nav>
 
@@ -123,6 +148,17 @@
     <main class="container">
         {% block content %}{% endblock %}
     </main>
-
+    <!-- Floating WhatsApp Support Button -->
+    <a href="https://wa.me/917564820314?text=Hi%20Mini%20Mart,%20I%20need%20help%20with%20my%20order/payment." 
+       target="_blank" 
+       style="position: fixed; bottom: 30px; right: 30px; background: #25D366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); z-index: 9999; transition: transform 0.3s;"
+       onmouseover="this.style.transform='scale(1.1)'" 
+       onmouseout="this.style.transform='scale(1)'">
+        
+        <!-- WhatsApp SVG Icon -->
+        <svg width="35" height="35" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+        </svg>
+    </a>
 </body>
 </html>
