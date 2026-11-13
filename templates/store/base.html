@@ -33,6 +33,54 @@
         .container { max-width: 1400px; margin: 40px auto; padding: 0 5%; flex: 1; width: 100%; box-sizing: border-box; }
     </style>
 </head>
+    <!-- POPUP MODAL FOR LOGIN/SIGNUP -->
+    {% if not user.is_authenticated %}
+    <div id="welcome-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+        <div style="background: white; padding: 40px; border-radius: 16px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: popIn 0.3s ease-out;">
+            
+            <h2 style="margin-top: 0; color: #1f2937; font-size: 1.8rem;">Welcome to Mini Mart! 🛒</h2>
+            <p style="color: #6b7280; margin-bottom: 30px;">Create an account to save your cart, track orders, and get exclusive offers.</p>
+            
+            <a href="/login/" style="display: block; width: 100%; padding: 14px; background: #0f9d58; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1rem; margin-bottom: 15px; box-sizing: border-box;">
+                Login to Account
+            </a>
+            
+            <a href="/register/" style="display: block; width: 100%; padding: 14px; background: #f3f4f6; color: #1f2937; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1rem; margin-bottom: 20px; box-sizing: border-box; border: 1px solid #e5e7eb;">
+                Create New Account
+            </a>
+            
+            <button onclick="closeModal()" style="background: none; border: none; color: #9ca3af; font-size: 0.9rem; cursor: pointer; text-decoration: underline;">
+                Continue as Guest
+            </button>
+        </div>
+    </div>
+
+    <style>
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+
+    <script>
+        // Check if the user has already dismissed the popup in this session
+        document.addEventListener("DOMContentLoaded", function() {
+            if (!sessionStorage.getItem('popup_dismissed')) {
+                document.getElementById('welcome-modal').style.display = 'flex';
+            }
+        });
+
+        function closeModal() {
+            document.getElementById('welcome-modal').style.display = 'none';
+            // Remember that they dismissed it so it doesn't show on every page click
+            sessionStorage.setItem('popup_dismissed', 'true');
+        }
+    </script>
+    {% endif %}
+
+</body>
+</html>
+
 <body>
 
     <!-- Main Navbar -->

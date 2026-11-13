@@ -1,0 +1,14 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div style="max-width: 600px; margin: 80px auto; text-align: center; background: white; padding: 50px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    <div style="font-size: 4rem; margin-bottom: 20px;">⏳</div>
+    <h1 style="color: #1f2937;">Payment Under Review</h1>
+    <p style="color: #6b7280; font-size: 1.1rem; margin-bottom: 30px;">
+        Thank you, {{ order.first_name }}! We are verifying your payment for Order <strong>#{{ order.id }}</strong>.
+    </p>
+    <p style="color: #6b7280;">
+        Once we confirm the payment, an official invoice will be generated and sent to your email (<strong>{{ order.email }}</strong>).
+    </p>
+    <a href="/" style="display: inline-block; margin-top: 30px; padding: 12px 24px; background: #0f9d58; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">Return to Shop</a>
+</div>
+{% endblock %}

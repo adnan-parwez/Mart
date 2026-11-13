@@ -1,0 +1,71 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div style="display: flex; gap: 30px; margin-top: 40px;">
+    <!-- Sidebar (Reuse your dashboard sidebar) -->
+    <div style="width: 250px; background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px 0; height: fit-content;">
+        <a href="{% url 'dashboard' %}" style="display: block; padding: 12px 20px; color: #4b5563; text-decoration: none; font-weight: 600;">📊 Overview</a>
+        <a href="{% url 'manage_products' %}" style="display: block; padding: 12px 20px; color: #4b5563; text-decoration: none; font-weight: 600;">📦 Inventory</a>
+        <a href="{% url 'manage_orders' %}" style="display: block; padding: 12px 20px; background: #f0fdf4; color: #0f9d58; text-decoration: none; font-weight: 600; border-left: 4px solid #0f9d58;">💳 Orders & Payments</a>
+    </div>
+
+    <div style="flex: 1;">
+        <h1 style="margin-top: 0; color: #1f2937;">Payment Verification</h1>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div style="background: #d1fae5; color: #065f46; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; margin-bottom: 40px;">
+            <div style="padding: 20px; border-bottom: 1px solid #e5e7eb; background: #fef3c7;">
+                <h3 style="margin: 0; color: #92400e;">Pending Payments (Check your UPI App)</h3>
+            </div>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding: 15px 20px; background: #f9fafb;">Order ID</th>
+                        <th style="text-align: left; padding: 15px 20px; background: #f9fafb;">Customer</th>
+                        <th style="text-align: left; padding: 15px 20px; background: #f9fafb;">Amount</th>
+                        <th style="text-align: left; padding: 15px 20px; background: #f9fafb;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in pending_orders %}
+                    <tr>
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #eee;"><strong>#{{ order.id }}</strong></td>
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #eee;">{{ order.first_name }}<br><span style="font-size: 0.8rem; color: #666;">{{ order.email }}</span></td>
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #eee;"><strong>₹{{ order.total_price }}</strong></td>
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #eee;">
+                            <a href="{% url 'confirm_payment' order.id %}" style="background: #0f9d58; color: white; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">Confirm & Send Invoice</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" style="padding: 20px; text-align: center; color: #666;">No pending payments.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden;">
+            <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
+                <h3 style="margin: 0; color: #1f2937;">Recently Confirmed Orders</h3>
+            </div>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tbody>
+                    {% for order in paid_orders %}
+                    <tr>
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #eee;">#{{ order.id }}</td>
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #eee;">{{ order.first_name }}</td>
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #eee;">₹{{ order.total_price }}</td>
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #eee;"><span style="color: #0f9d58; font-weight: bold;">✓ Paid</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

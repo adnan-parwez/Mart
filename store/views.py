@@ -74,10 +74,13 @@ def cart_detail(request):
 # 3. CHECKOUT & UPI PAYMENT VIEWS
 # ==========================================
 
+import urllib.parse
+from django.conf import settings
+from django.core.mail import EmailMessage
+
 def checkout(request):
     cart = request.session.get('cart', {})
-    if not cart: 
-        return redirect('shop')
+    if not cart: return redirect('shop')
 
     if request.method == 'POST':
         payment_method = request.POST.get('payment_method')
@@ -88,10 +91,8 @@ def checkout(request):
             last_name=request.POST.get('last_name'), 
             email=request.POST.get('email'), 
             address=request.POST.get('address'),
-            city=request.POST.get('city'),
-            pincode=request.POST.get('pincode'),
             payment_method=payment_method,
-            is_paid=False
+            is_paid=False # ALWAYS False initially for manual UPI
         )
 
         total_price = 0
@@ -105,7 +106,7 @@ def checkout(request):
         request.session['cart'] = {} 
 
         if payment_method == 'UPI':
-            # Generate dynamic UPI QR code
+            # Generate UPI URL and QR Code
             upi_url = f"upi://pay?pa={settings.UPI_ID}&pn={urllib.parse.quote(settings.UPI_NAME)}&am={total_price}&cu=INR&tn=Order_{order.id}"
             qr_code_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={urllib.parse.quote(upi_url)}"
             
@@ -116,13 +117,10 @@ def checkout(request):
                 'total_price': total_price
             })
             
-        return redirect('order_success', order_id=order.id)
+        # For Cash on Delivery, it's also pending until delivery
+        return render(request, 'store/pending.html', {'order': order})
 
     return render(request, 'store/checkout.html')
-
-def order_success(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    return render(request, 'store/success.html', {'order': order})
 
 # ==========================================
 # 4. USER AUTHENTICATION VIEWS
@@ -221,3 +219,66 @@ def delete_product(request, product_id):
 def manage_customers(request):
     customers = User.objects.filter(is_staff=False).order_by('-date_joined')
     return render(request, 'store/manage_customers.html', {'customers': customers})
+
+def pending_page(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'store/pending.html', {'order': order})
+
+@staff_member_required
+def manage_orders(request):
+    # Get all orders that are NOT paid yet
+    pending_orders = Order.objects.filter(is_paid=False).order_by('-created_at')
+    paid_orders = Order.objects.filter(is_paid=True).order_by('-created_at')[:10]
+    return render(request, 'store/manage_orders.html', {
+        'pending_orders': pending_orders,
+        'paid_orders': paid_orders
+    })
+
+@staff_member_required
+def confirm_payment_and_send_invoice(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    
+    # 1. Mark as paid
+    order.is_paid = True
+    order.save()
+
+    # 2. Send the Invoice Email
+    subject = f"Payment Confirmed - Invoice for Order #{order.id}"
+    body = f"""
+    Hi {order.first_name},
+    
+    We have received your payment of ₹{order.total_price}. Your order is now confirmed!
+    
+    Order Details:
+    Order ID: #{order.id}
+    Payment Method: {order.payment_method}
+    
+    We will ship your items shortly.
+    
+    Thank you for shopping with Mini Mart!
+    """
+    
+    email = EmailMessage(
+        subject,
+        body,
+        'your_email@gmail.com', # Replace with your email
+        [order.email],          # Sends to the customer
+    )
+    email.send()
+
+    messages.success(request, f"Invoice sent to {order.email}!")
+    return redirect('manage_orders')
+def order_success(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    
+    # If it's Cash on Delivery, we can assume the order is confirmed
+    if order.payment_method == 'Cash on Delivery':
+        order.is_paid = True
+        order.save()
+        
+    # If it's UPI, redirect them to the pending page (since they need to wait for you to verify it)
+    if order.payment_method == 'UPI':
+        return redirect('pending_page', order_id=order.id)
+
+    # Show the invoice for COD
+    return render(request, 'store/success.html', {'order': order})
