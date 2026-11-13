@@ -1,0 +1,13 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+    <h2>{{ title }}</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" style="margin-top: 20px; background: #0f9d58; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Save Product</button>
+    </form>
+</div>
+{% endblock %}

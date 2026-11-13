@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Mini Mart{% endblock %}</title>
+    <style>
+        /* Base styles (keep your existing styles here) */
+        :root { --primary: #0f9d58; --bg: #f3f4f6; --text: #1f2937; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; min-height: 100vh; }
+        
+        /* Top Header */
+        .top-bar { background: #111827; color: white; padding: 8px 5%; font-size: 0.85rem; display: flex; justify-content: space-between; }
+        .top-bar a { color: #9ca3af; text-decoration: none; margin-left: 15px; }
+        .top-bar a:hover { color: white; }
+
+        .navbar { background: #ffffff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; }
+        .logo { font-size: 1.8rem; font-weight: 900; color: var(--primary); text-decoration: none; }
+        
+        .search-bar { flex: 1; max-width: 500px; display: flex; margin: 0 30px; }
+        .search-bar input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px 0 0 8px; outline: none; }
+        .search-bar button { padding: 12px 25px; background: var(--primary); border: none; color: white; border-radius: 0 8px 8px 0; cursor: pointer; font-weight: bold; }
+        
+        .nav-actions { display: flex; gap: 20px; align-items: center; }
+        .nav-actions a { text-decoration: none; color: var(--text); font-weight: 600; display: flex; align-items: center; gap: 5px; transition: color 0.2s; }
+        .nav-actions a:hover { color: var(--primary); }
+        .btn-cart { background: var(--primary); color: white !important; padding: 10px 20px; border-radius: 8px; }
+
+        /* Category Navigation */
+        .category-bar { background: white; padding: 0 5%; display: flex; gap: 25px; border-bottom: 1px solid #e5e7eb; }
+        .category-bar a { text-decoration: none; color: #555; font-weight: 600; padding: 15px 0; font-size: 0.95rem; border-bottom: 3px solid transparent; transition: 0.2s; }
+        .category-bar a:hover { color: var(--primary); border-bottom-color: var(--primary); }
+
+        .container { max-width: 1400px; margin: 40px auto; padding: 0 5%; flex: 1; width: 100%; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+    <!-- Main Navbar -->
+    <nav class="navbar">
+        <a href="/" class="logo">🛒 MiniMart</a>
+        
+        <form class="search-bar" method="GET" action="/">
+            <input type="text" name="q" placeholder="Search for items..." value="{{ query|default:'' }}">
+            <button type="submit">Search</button>
+        </form>
+        
+        <!-- Right Side Actions -->
+        <div class="nav-actions">
+            {% if user.is_authenticated %}
+                <!-- Only show this if the user is an Admin/Staff -->
+                {% if user.is_staff %}
+                    <a href="/dashboard/" style="color: #0f9d58; font-weight: bold;">Admin Dashboard</a>
+                {% endif %}
+                
+                <span style="color: #6b7280; font-weight: 600;">Hi, {{ user.username }}</span>
+                <a href="/logout/" style="color: #ef4444;">Logout</a>
+            {% else %}
+                <a href="/login/">Login</a>
+                <a href="/register/">Sign Up</a>
+            {% endif %}
+            
+            <a href="/cart/" class="btn-cart">Cart 🛍️</a>
+        </div>
+    </nav>
+
+    <!-- Dynamic Categories -->
+    <div class="category-bar">
+        <a href="/">All Products</a>
+        {% for cat in all_categories %}
+            <a href="{% url 'category_view' cat %}">{{ cat }}</a>
+        {% endfor %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,18 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="container" style="max-width: 500px; text-align: center;">
+    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <h2>Scan to Pay ₹{{ total_price }}</h2>
+        <p style="color: #666; margin-bottom: 20px;">Scan this QR code using GPay, PhonePe, or Paytm.</p>
+        
+        <img src="{{ qr_code_url }}" alt="UPI QR Code" style="width: 250px; height: 250px; border-radius: 12px; border: 1px solid #eee; padding: 10px;">
+        
+        <p style="margin-top: 20px;">Or copy this UPI ID:</p>
+        <div style="background: #f3f4f6; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 1.2rem; font-weight: bold; margin-bottom: 20px;">
+            {{ upi_id }}
+        </div>
+        
+        <a href="{% url 'order_success' order.id %}" class="btn-primary" style="display: block; text-decoration: none; padding: 15px;">I have completed the payment</a>
+    </div>
+</div>
+{% endblock %}

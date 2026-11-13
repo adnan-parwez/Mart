@@ -1,0 +1,51 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<style>
+    /* Offer Banner */
+    .offer-banner { background: linear-gradient(135deg, #ff7e5f, #feb47b); color: white; padding: 30px; border-radius: 12px; text-align: center; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(255,126,95,0.3); }
+    .offer-banner h2 { margin: 0; font-size: 2rem; }
+    .offer-banner p { margin: 10px 0 0 0; font-size: 1.1rem; opacity: 0.9; }
+
+    /* Product Grid */
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+    .product-card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 15px; text-align: center; transition: 0.3s; display: flex; flex-direction: column; }
+    .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+    .product-image { width: 100%; height: 150px; object-fit: contain; margin-bottom: 15px; mix-blend-mode: multiply; }
+    .category-tag { font-size: 0.7rem; color: #0f9d58; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+    .product-title { font-size: 1rem; font-weight: 600; margin: 0 0 10px 0; color: #1f2937; }
+    .product-price { font-size: 1.2rem; font-weight: 800; color: #1f2937; margin-bottom: 15px; }
+    .add-btn { background: #ecfdf5; color: #0f9d58; border: 1px solid #0f9d58; padding: 10px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: auto; transition: 0.2s; }
+    .add-btn:hover { background: #0f9d58; color: white; }
+</style>
+
+<!-- Offer Banner -->
+<div class="offer-banner">
+    <h2>🎉 Mega Sale is Live!</h2>
+    <p>Get up to 40% off on all Biscuits and Snacks today.</p>
+</div>
+
+<h2 style="margin-bottom: 20px; color: #1f2937;">
+    {% if query %} Search Results for "{{ query }}" {% else %} Popular Products {% endif %}
+</h2>
+
+<div class="product-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <div class="category-tag">{{ product.category }}</div>
+        
+        {% if product.image %}
+            <img src="{{ product.image.url }}" class="product-image" alt="{{ product.name }}">
+        {% else %}
+            <!-- Generic Product Image using a free API based on the product name -->
+            <img src="https://source.unsplash.com/300x300/?{{ product.name }},food" class="product-image" alt="{{ product.name }}">
+        {% endif %}
+        
+        <h3 class="product-title">{{ product.name }}</h3>
+        <div class="product-price">₹{{ product.price }}</div>
+        <a href="{% url 'add_to_cart' product.id %}" class="add-btn">Add to Cart</a>
+    </div>
+    {% empty %}
+    <p>No products found.</p>
+    {% endfor %}
+</div>
+{% endblock %}

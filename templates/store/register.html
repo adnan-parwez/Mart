@@ -1,0 +1,68 @@
+{% extends 'store/base.html' %}
+{% block title %}Register | Mini Mart{% endblock %}
+
+{% block content %}
+<div style="max-width: 450px; margin: 60px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    <h2 style="text-align: center; margin-bottom: 30px; color: #1f2937;">Create an Account</h2>
+    
+    <!-- Display global form errors (if any) -->
+    {% if form.non_field_errors %}
+        <div style="background: #fee2e2; color: #dc2626; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem;">
+            {{ form.non_field_errors.0 }}
+        </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <!-- Username Field -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Username</label>
+            <input type="text" name="username" required 
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box; font-size: 1rem;"
+                   placeholder="Choose a username"
+                   value="{{ form.username.value|default:'' }}">
+            {% if form.username.errors %}
+                <p style="color: #dc2626; font-size: 0.85rem; margin-top: 5px;">{{ form.username.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Password Field -->
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Password</label>
+            <input type="password" name="password1" required 
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box; font-size: 1rem;"
+                   placeholder="Create a strong password">
+            {% if form.password1.errors %}
+                <p style="color: #dc2626; font-size: 0.85rem; margin-top: 5px;">{{ form.password1.errors.0 }}</p>
+            {% endif %}
+            
+            <!-- Clean help text -->
+            <ul style="font-size: 0.8rem; color: #6b7280; margin-top: 10px; padding-left: 20px;">
+                <li>At least 8 characters.</li>
+                <li>Cannot be entirely numeric.</li>
+                <li>Cannot be too similar to your username.</li>
+            </ul>
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Confirm Password</label>
+            <input type="password" name="password2" required 
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box; font-size: 1rem;"
+                   placeholder="Type your password again">
+            {% if form.password2.errors %}
+                <p style="color: #dc2626; font-size: 0.85rem; margin-top: 5px;">{{ form.password2.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 14px; background: #0f9d58; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">
+            Sign Up
+        </button>
+    </form>
+    
+    <p style="text-align: center; margin-top: 20px; color: #666;">
+        Already have an account? <a href="/login/" style="color: #0f9d58; font-weight: bold; text-decoration: none;">Login</a>
+    </p>
+</div>
+{% endblock %}

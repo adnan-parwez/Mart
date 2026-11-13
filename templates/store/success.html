@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice | Mini Mart</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f3f4f6; padding: 40px; }
+        .invoice { max-width: 700px; margin: auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid #0f9d58; }
+        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        .header h1 { margin: 0; color: #0f9d58; }
+        .details { display: flex; justify-content: space-between; margin-bottom: 30px; color: #555; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
+        .total-row { text-align: right; font-size: 1.2rem; font-weight: bold; margin-top: 20px; }
+        .print-btn { background: #111827; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; margin-top: 20px; }
+        
+        /* Print Settings */
+        @media print {
+            body { background: white; padding: 0; }
+            .invoice { box-shadow: none; border: none; padding: 0; }
+            .print-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice">
+        <div class="header">
+            <div>
+                <h1>INVOICE</h1>
+                <p>Order #{{ order.id }}</p>
+            </div>
+            <div style="text-align: right;">
+                <h3>Mini Mart</h3>
+                <p>Date: {{ order.created_at|date:"M d, Y" }}</p>
+            </div>
+        </div>
+
+        <div class="details">
+            <div>
+                <strong>Billed To:</strong><br>
+                {{ order.first_name }} {{ order.last_name }}<br>
+                {{ order.address }}<br>
+                {{ order.city }} - {{ order.pincode }}
+            </div>
+            <div style="text-align: right;">
+                <strong>Payment Method:</strong><br>
+                {{ order.payment_method }}<br>
+                <strong>Status:</strong> 
+                {% if order.is_paid %}<span style="color: green;">Paid</span>{% else %}<span style="color: orange;">Pending</span>{% endif %}
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.price }}</td>
+                    <td>₹{{ item.price|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="total-row">
+            Grand Total: ₹{{ order.total_price }}
+        </div>
+
+        <div style="text-align: center;">
+            <button class="print-btn" onclick="window.print()">🖨️ Print Invoice</button>
+            <a href="/" style="display: block; margin-top: 15px; color: #0f9d58;">Back to Shop</a>
+        </div>
+    </div>
+</body>
+</html>

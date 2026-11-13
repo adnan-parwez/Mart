@@ -1,0 +1,42 @@
+{% extends 'store/base.html' %}
+{% block title %}Customers | Admin{% endblock %}
+
+{% block content %}
+<div class="admin-layout" style="display: flex; gap: 30px; margin-top: -40px;">
+    <!-- Reuse the sidebar from the dashboard -->
+    <div class="admin-sidebar" style="width: 250px; background: #111827; color: white; border-radius: 12px; padding: 20px 0; flex-shrink: 0; height: fit-content;">
+        <h3 style="padding: 0 20px; margin-bottom: 15px; color: #9ca3af; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Admin Menu</h3>
+        <a href="{% url 'dashboard' %}" style="display: block; color: #d1d5db; padding: 12px 20px; text-decoration: none; font-weight: 500;">📊 Overview</a>
+        <a href="{% url 'manage_products' %}" style="display: block; color: #d1d5db; padding: 12px 20px; text-decoration: none; font-weight: 500;">📦 Inventory</a>
+        <a href="{% url 'manage_customers' %}" style="display: block; background: #1f2937; color: white; padding: 12px 20px; text-decoration: none; font-weight: 500; border-left: 3px solid #0f9d58;">👥 Customers</a>
+    </div>
+
+    <!-- Main Content -->
+    <div style="flex: 1;">
+        <h1 style="font-size: 1.8rem; margin: 0 0 25px 0; color: #1f2937;">Customer Management</h1>
+        
+        <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding: 12px 20px; background: #f9fafb; color: #6b7280; font-size: 0.8rem; text-transform: uppercase;">Customer Name</th>
+                        <th style="text-align: left; padding: 12px 20px; background: #f9fafb; color: #6b7280; font-size: 0.8rem; text-transform: uppercase;">Email</th>
+                        <th style="text-align: left; padding: 12px 20px; background: #f9fafb; color: #6b7280; font-size: 0.8rem; text-transform: uppercase;">Joined Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #f3f4f6;"><strong>{{ customer.username }}</strong></td>
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #f3f4f6;">{{ customer.email }}</td>
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #f3f4f6;">{{ customer.date_joined|date:"M d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" style="text-align: center; padding: 20px;">No customers yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
