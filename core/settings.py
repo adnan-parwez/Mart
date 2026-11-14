@@ -146,3 +146,5 @@ MAILERS = {
         },
     },
 }
+
+AUTH_USER_MODEL = 'store.CustomUser'

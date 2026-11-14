@@ -1,44 +1,123 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Checkout | Mini Mart</title>
-    <style>
-        body { font-family: sans-serif; background: #f3f4f6; padding: 40px; margin: 0; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        h1 { margin-top: 0; }
-        input, textarea, select { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
-        .pay-option { display: flex; align-items: center; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; cursor: pointer; }
-        .pay-option input { width: auto; margin-right: 15px; }
-        button { width: 100%; padding: 15px; background: #0f9d58; color: white; border: none; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Checkout</h1>
-        <form method="POST">
-            {% csrf_token %}
-            <input type="text" name="first_name" placeholder="First Name" required>
-            <input type="text" name="last_name" placeholder="Last Name" required>
-            <input type="email" name="email" placeholder="Email Address" required>
-            <textarea name="address" placeholder="Full Address" required></textarea>
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="container" style="max-width: 800px; margin: 40px auto;">
+    <h2 style="margin-bottom: 30px;">Secure Checkout</h2>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <!-- 1. Contact Details -->
+        <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 20px;">
+            <h3 style="margin-top: 0;">1. Contact Information</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label style="font-weight: 600; font-size: 0.9rem;">Full Name</label>
+                    <input type="text" name="full_name" required value="{{ user.first_name }}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+                </div>
+                <div>
+                    <label style="font-weight: 600; font-size: 0.9rem;">Phone Number</label>
+                    <input type="text" name="phone" required value="{{ user.phone }}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+                </div>
+                <div style="grid-column: 1 / -1;">
+                    <label style="font-weight: 600; font-size: 0.9rem;">Email Address</label>
+                    <input type="email" name="email" required value="{{ user.email }}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Delivery Method -->
+        <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 20px;">
+            <h3 style="margin-top: 0;">2. Delivery Method</h3>
             
-            <div style="display: flex; gap: 10px;">
-                <input type="text" name="city" placeholder="City" required>
-                <input type="text" name="pincode" placeholder="Pincode" required>
+            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                <label style="flex: 1; padding: 15px; border: 2px solid #0f9d58; border-radius: 8px; cursor: pointer; background: #ecfdf5;">
+                    <input type="radio" name="delivery_type" value="home" checked onchange="toggleAddress('home')"> 
+                    <strong style="margin-left: 10px;">Home Delivery</strong>
+                </label>
+                <label style="flex: 1; padding: 15px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer;">
+                    <input type="radio" name="delivery_type" value="store_pickup" onchange="toggleAddress('store')"> 
+                    <strong style="margin-left: 10px;">Store Pickup (RUMI MART)</strong>
+                </label>
             </div>
 
-            <h3>Payment Method</h3>
-            <label class="pay-option">
-                <input type="radio" name="payment_method" value="UPI" checked>
-                <div><strong>UPI (GPay / PhonePe / Paytm)</strong></div>
-            </label>
-            <label class="pay-option">
-                <input type="radio" name="payment_method" value="Cash on Delivery">
-                <div><strong>Cash on Delivery (COD)</strong></div>
-            </label>
+            <!-- Home Address Options -->
+            <div id="address-section">
+                {% if saved_addresses %}
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: 600; font-size: 0.9rem;">Select Saved Address</label>
+                    <select name="address_id" id="address_select" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;" onchange="toggleNewAddress()">
+                        {% for addr in saved_addresses %}
+                            <option value="{{ addr.id }}">{{ addr.full_name }} - {{ addr.address_line }}, {{ addr.city }}</option>
+                        {% endfor %}
+                        <option value="new">+ Add New Address</option>
+                    </select>
+                </div>
+                {% endif %}
 
-            <button type="submit">Place Order</button>
-        </form>
-    </div>
-</body>
-</html>
+                <div id="new-address-form" style="display: {% if saved_addresses %}none{% else %}block{% endif %};">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div style="grid-column: 1 / -1;">
+                            <label style="font-weight: 600; font-size: 0.9rem;">Address</label>
+                            <input type="text" name="address" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+                        </div>
+                        <div>
+                            <label style="font-weight: 600; font-size: 0.9rem;">City</label>
+                            <input type="text" name="city" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+                        </div>
+                        <div>
+                            <label style="font-weight: 600; font-size: 0.9rem;">Pincode</label>
+                            <input type="text" name="pincode" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Store Pickup Message -->
+            <div id="store-pickup-section" style="display: none; padding: 20px; background: #f9fafb; border-radius: 8px;">
+                <h4 style="margin: 0 0 10px 0; color: #0f9d58;">📍 Store Pickup Address:</h4>
+                <p style="margin: 0;">RUMI MART</p>
+                <p style="margin: 5px 0 0 0; color: #6b7280;">Pick up your order directly from our store.</p>
+            </div>
+        </div>
+
+        <!-- 3. Payment Method -->
+        <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 20px;">
+            <h3 style="margin-top: 0;">3. Payment Method</h3>
+            <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding: 15px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                <input type="radio" name="payment_method" value="UPI" checked>
+                <strong>UPI (GPay/PhonePe)</strong>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; padding: 15px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                <input type="radio" name="payment_method" value="COD">
+                <strong>Cash on Delivery</strong>
+            </label>
+        </div>
+
+        <button type="submit" style="width: 100%; padding: 18px; background: #0f9d58; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer;">
+            Place Order
+        </button>
+    </form>
+</div>
+
+<script>
+    function toggleAddress(type) {
+        if(type === 'home') {
+            document.getElementById('address-section').style.display = 'block';
+            document.getElementById('store-pickup-section').style.display = 'none';
+        } else {
+            document.getElementById('address-section').style.display = 'none';
+            document.getElementById('store-pickup-section').style.display = 'block';
+        }
+    }
+
+    function toggleNewAddress() {
+        let select = document.getElementById('address_select');
+        let form = document.getElementById('new-address-form');
+        if(select.value === 'new') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

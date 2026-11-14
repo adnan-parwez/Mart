@@ -7,42 +7,84 @@
     .offer-banner p { margin: 10px 0 0 0; font-size: 1.1rem; opacity: 0.9; }
 
     /* Product Grid */
-    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-    .product-card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 15px; text-align: center; transition: 0.3s; display: flex; flex-direction: column; }
-    .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
-    .product-image { width: 100%; height: 150px; object-fit: contain; margin-bottom: 15px; mix-blend-mode: multiply; }
-    .category-tag { font-size: 0.7rem; color: #0f9d58; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
-    .product-title { font-size: 1rem; font-weight: 600; margin: 0 0 10px 0; color: #1f2937; }
-    .product-price { font-size: 1.2rem; font-weight: 800; color: #1f2937; margin-bottom: 15px; }
-    .add-btn { background: #ecfdf5; color: #0f9d58; border: 1px solid #0f9d58; padding: 10px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: auto; transition: 0.2s; }
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+    .card { background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 15px; display: flex; flex-direction: column; transition: 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
+    
+    /* Add to Cart Button */
+    .add-btn { background: #ecfdf5; color: #0f9d58; border: 1px solid #0f9d58; padding: 10px; border-radius: 8px; text-align: center; text-decoration: none; font-weight: bold; margin-top: auto; transition: 0.2s; display: block; }
     .add-btn:hover { background: #0f9d58; color: white; }
 </style>
 
 <!-- Offer Banner -->
 <div class="offer-banner">
     <h2>🎉 Mega Sale is Live!</h2>
-    <p>Get up to 40% off on all Biscuits and Snacks today.</p>
+    <p>Get up to 10% off on all products today.</p>
 </div>
 
 <h2 style="margin-bottom: 20px; color: #1f2937;">
     {% if query %} Search Results for "{{ query }}" {% else %} Popular Products {% endif %}
 </h2>
 
+<!-- Main Product Grid -->
 <div class="product-grid">
     {% for product in products %}
-    <div class="product-card">
-        <div class="category-tag">{{ product.category }}</div>
+    <div class="card" style="position: relative; ...">
         
-        {% if product.image %}
-            <img src="{{ product.image.url }}" class="product-image" alt="{{ product.name }}">
-        {% else %}
-            <!-- Generic Product Image using a free API based on the product name -->
-            <img src="https://source.unsplash.com/300x300/?{{ product.name }},food" class="product-image" alt="{{ product.name }}">
+                <!-- Wishlist Heart Icon -->
+        <a href="{% url 'add_to_wishlist' product.id %}" style="position: absolute; top: 10px; right: 10px; background: white; border: 1px solid #e5e7eb; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; text-decoration: none;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='white'">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+        </a>
+        
+        <!-- ... rest of your card ... -->
+        
+        <!-- Image Container -->
+        <div style="height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+            {% else %}
+                <img src="https://source.unsplash.com/300x300/?{{ product.name }},grocery" style="max-height: 100%; max-width: 100%; object-fit: contain; border-radius: 8px;">
+            {% endif %}
+        </div>
+
+        <!-- Category -->
+        <div style="font-size: 0.75rem; color: #0f9d58; font-weight: 700; text-transform: uppercase; margin-bottom: 5px;">
+            {{ product.category|default:"General" }}
+        </div>
+
+        <!-- Product Name -->
+        <h3 style="font-size: 1.05rem; font-weight: 600; color: #1f2937; margin: 0 0 5px 0; line-height: 1.4;">
+            {{ product.name }}
+        </h3>
+
+        <!-- Quantity -->
+        <p style="font-size: 0.85rem; color: #6b7280; margin: 0 0 12px 0;">1 unit</p>
+
+        <!-- Price and MRP -->
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px; margin-top: auto;">
+            <span style="font-size: 1.25rem; font-weight: 800; color: #1f2937;">₹{{ product.price }}</span>
+            
+            {% if product.mrp %}
+                <span style="font-size: 0.9rem; color: #9ca3af; text-decoration: line-through;">MRP ₹{{ product.mrp }}</span>
+            {% endif %}
+        </div>
+
+        <!-- Discount Tag -->
+        {% if product.discount_percentage > 0 %}
+            <div style="font-size: 0.8rem; color: #0f9d58; font-weight: 700; margin-bottom: 10px;">
+                {{ product.discount_percentage }}% OFF
+            </div>
         {% endif %}
+
+        <div style="font-size: 0.7rem; color: #9ca3af; margin-bottom: 15px;">(Inclusive of all taxes)</div>
+
+        <!-- Add to Cart Button -->
+        <a href="{% url 'add_to_cart' product.id %}" class="add-btn">
+            Add to Cart
+        </a>
         
-        <h3 class="product-title">{{ product.name }}</h3>
-        <div class="product-price">₹{{ product.price }}</div>
-        <a href="{% url 'add_to_cart' product.id %}" class="add-btn">Add to Cart</a>
     </div>
     {% empty %}
     <p>No products found.</p>

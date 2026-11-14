@@ -14,15 +14,38 @@
     <form method="POST">
         {% csrf_token %}
         
-        <!-- Username Field -->
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Username</label>
-            <input type="text" name="username" required 
+                <!-- First Name Field -->
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">First Name *</label>
+            <input type="text" name="first_name" required 
                    style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box; font-size: 1rem;"
-                   placeholder="Choose a username"
-                   value="{{ form.username.value|default:'' }}">
-            {% if form.username.errors %}
-                <p style="color: #dc2626; font-size: 0.85rem; margin-top: 5px;">{{ form.username.errors.0 }}</p>
+                   placeholder="Enter your first name"
+                   value="{{ form.first_name.value|default:'' }}">
+            {% if form.first_name.errors %}
+                <p style="color: #dc2626; font-size: 0.85rem; margin-top: 5px;">{{ form.first_name.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Last Name Field -->
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Last Name</label>
+            <input type="text" name="last_name" 
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box; font-size: 1rem;"
+                   placeholder="Enter your last name"
+                   value="{{ form.last_name.value|default:'' }}">
+        </div>
+
+        <!-- Phone Field -->
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Phone Number *</label>
+            <input type="text" name="phone" required 
+                   style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box; font-size: 1rem;"
+                   placeholder="Enter 10-digit mobile number"
+                   pattern="[0-9]{10}"
+                   title="Please enter a 10-digit phone number"
+                   value="{{ form.phone.value|default:'' }}">
+            {% if form.phone.errors %}
+                <p style="color: #dc2626; font-size: 0.85rem; margin-top: 5px;">{{ form.phone.errors.0 }}</p>
             {% endif %}
         </div>
 

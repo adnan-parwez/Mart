@@ -1,31 +1,85 @@
 {% extends 'store/base.html' %}
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-    <h1>Inventory Management</h1>
-    <a href="{% url 'add_product' %}" class="btn-primary" style="background: #0f9d58; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px;">+ Add New Product</a>
-</div>
+<style>
+    .inv-container { max-width: 1200px; margin: 40px auto; background: white; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0,0,0,0.02); overflow: hidden; }
+    .inv-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 30px; border-bottom: 1px solid #e5e7eb; background: #f9fafb; }
+    .inv-header h1 { margin: 0; font-size: 1.5rem; color: #1f2937; }
+    .btn-add { background: #0f9d58; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.95rem; }
+    .btn-add:hover { background: #0b7a43; }
+    
+    .inv-table { width: 100%; border-collapse: collapse; text-align: left; }
+    .inv-table th { padding: 15px 30px; background: white; color: #6b7280; font-size: 0.8rem; text-transform: uppercase; font-weight: 700; border-bottom: 1px solid #e5e7eb; }
+    .inv-table td { padding: 15px 30px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+    .inv-table tr:hover { background: #f9fafb; }
+    
+    .prod-img { width: 50px; height: 50px; object-fit: contain; border-radius: 8px; border: 1px solid #e5e7eb; padding: 2px; background: white; }
+    .action-link { text-decoration: none; font-weight: 600; font-size: 0.9rem; margin-right: 15px; }
+    .action-edit { color: #3b82f6; }
+    .action-delete { color: #ef4444; }
+</style>
 
-<table style="width: 100%; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-collapse: collapse;">
-    <tr style="background: #f9fafb; text-align: left;">
-        <th style="padding: 15px;">Image</th>
-        <th style="padding: 15px;">Name</th>
-        <th style="padding: 15px;">Category</th>
-        <th style="padding: 15px;">Price</th>
-        <th style="padding: 15px;">Actions</th>
-    </tr>
-    {% for p in products %}
-    <tr style="border-bottom: 1px solid #eee;">
-        <td style="padding: 15px;">
-            {% if p.image %}<img src="{{ p.image.url }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">{% else %}No Img{% endif %}
-        </td>
-        <td style="padding: 15px; font-weight: bold;">{{ p.name }}</td>
-        <td style="padding: 15px;">{{ p.category }}</td>
-        <td style="padding: 15px;">₹{{ p.price }}</td>
-        <td style="padding: 15px;">
-            <a href="{% url 'edit_product' p.id %}" style="color: #3b82f6; text-decoration: none; margin-right: 10px;">Edit</a>
-            <a href="{% url 'delete_product' p.id %}" style="color: #ef4444; text-decoration: none;" onclick="return confirm('Are you sure?')">Delete</a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<div class="inv-container">
+    <div class="inv-header">
+        <h1>Inventory Management</h1>
+        <a href="{% url 'add_product' %}" class="btn-add">+ Add New Product</a>
+    </div>
+
+    <table class="inv-table">
+        <thead>
+            <tr>
+                <th style="width: 80px;">Image</th>
+                <th>Product Details</th>
+                <th>Category</th>
+                <th>Price / MRP</th>
+                <th>Stock</th>
+                <th style="width: 150px; text-align: right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in products %}
+            <tr>
+                <td>
+                    {% if p.image %}
+                        <img src="{{ p.image.url }}" class="prod-img">
+                    {% else %}
+                        <div class="prod-img" style="display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 10px;">None</div>
+                    {% endif %}
+                </td>
+                <td>
+                    <strong style="color: #1f2937; display: block; margin-bottom: 4px;">{{ p.name }}</strong>
+                    <span style="font-size: 0.8rem; color: #6b7280;">ID: #{{ p.id }}</span>
+                </td>
+                <td>
+                    <span style="background: #f3f4f6; color: #4b5563; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                        {{ p.category|default:"General" }}
+                    </span>
+                </td>
+                <td>
+                    <strong style="color: #0f9d58;">₹{{ p.price }}</strong>
+                    {% if p.mrp %}
+                        <br><span style="font-size: 0.8rem; color: #9ca3af; text-decoration: line-through;">MRP ₹{{ p.mrp }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if p.stock > 5 %}
+                        <span style="color: #0f9d58; font-weight: 600;">{{ p.stock }} in stock</span>
+                    {% elif p.stock > 0 %}
+                        <span style="color: #f59e0b; font-weight: 600;">Only {{ p.stock }} left</span>
+                    {% else %}
+                        <span style="color: #ef4444; font-weight: 600;">Out of Stock</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: right;">
+                    <a href="{% url 'edit_product' p.id %}" class="action-link action-edit">Edit</a>
+                    <a href="{% url 'delete_product' p.id %}" class="action-link action-delete" onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px; color: #6b7280;">No products in inventory. Add your first product!</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

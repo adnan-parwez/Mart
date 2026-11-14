@@ -1,13 +1,50 @@
 {% extends 'store/base.html' %}
 {% block content %}
-<div style="max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-    <h2>{{ title }}</h2>
+<style>
+    .form-container { max-width: 700px; margin: 40px auto; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; overflow: hidden; }
+    .form-header { background: #f9fafb; padding: 25px 30px; border-bottom: 1px solid #e5e7eb; }
+    .form-header h2 { margin: 0; color: #1f2937; font-size: 1.5rem; }
+    .form-header p { margin: 5px 0 0 0; color: #6b7280; font-size: 0.9rem; }
+    
+    .form-body { padding: 30px; }
+    
+    /* Style all Django form fields automatically */
+    .form-body p { margin-bottom: 20px; display: flex; flex-direction: column; }
+    .form-body label { font-weight: 600; font-size: 0.9rem; color: #374151; margin-bottom: 8px; }
+    .form-body input[type="text"], 
+    .form-body input[type="number"], 
+    .form-body input[type="file"], 
+    .form-body textarea, 
+    .form-body select {
+        width: 100%; padding: 12px 15px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; transition: 0.2s; box-sizing: border-box; background: #f9fafb;
+    }
+    .form-body input:focus, .form-body textarea:focus { border-color: #0f9d58; outline: none; background: white; box-shadow: 0 0 0 3px rgba(15, 157, 88, 0.1); }
+    .form-body input[type="file"] { padding: 10px; background: white; }
+    
+    .form-footer { background: #f9fafb; padding: 20px 30px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+    .btn-cancel { color: #6b7280; text-decoration: none; font-weight: 600; }
+    .btn-save { background: #0f9d58; color: white; padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+    .btn-save:hover { background: #0b7a43; }
+    
+    .help-text { font-size: 0.8rem; color: #9ca3af; margin-top: 5px; }
+</style>
+
+<div class="form-container">
+    <div class="form-header">
+        <h2>{{ title }}</h2>
+        <p>Fill out the details below to update your store inventory.</p>
+    </div>
+    
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+        <div class="form-body">
             {{ form.as_p }}
         </div>
-        <button type="submit" style="margin-top: 20px; background: #0f9d58; color: white; padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Save Product</button>
+        
+        <div class="form-footer">
+            <a href="{% url 'manage_products' %}" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save">Save Product</button>
+        </div>
     </form>
 </div>
 {% endblock %}

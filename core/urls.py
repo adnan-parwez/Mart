@@ -7,7 +7,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.shop, name='shop'),
-    path('category/<str:category_name>/', views.category_view, name='category_view'),
+    path('category/<path:category_name>/', views.category_view, name='category_view'),
     path('cart/', views.cart_detail, name='cart_detail'),
     path('add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
@@ -18,8 +18,8 @@ urlpatterns = [
     path('pending/<int:order_id>/', views.pending_page, name='pending_page'),
     
     # Auth
-    path('register/', views.register, name='register'),
     path('login/', views.user_login, name='login'),
+    path('register/', views.register, name='register'),
     path('logout/', views.user_logout, name='logout'),
     
     # Admin Dashboard
@@ -36,5 +36,8 @@ urlpatterns = [
     path('dashboard/orders/confirm/<int:order_id>/', views.confirm_payment_and_send_invoice, name='confirm_payment'),
     path('my-orders/', views.my_orders, name='my_orders'),
     path('my-orders/invoice/<int:order_id>/', views.order_invoice, name='order_invoice'),
+    path('profile/', views.profile, name='profile'),
+    path('profile/edit/', views.edit_profile, name='edit_profile'),
+    path('wishlist/add/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

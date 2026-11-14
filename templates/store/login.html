@@ -12,16 +12,20 @@
 
     <form method="POST">
         {% csrf_token %}
+        
         <div style="margin-bottom: 20px;">
-            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Username</label>
-            <input type="text" name="username" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Email Address</label>
+            <!-- Change name="username" to name="email" -->
+            <input type="email" name="email" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box;" placeholder="Enter your email">
         </div>
+        
         <div style="margin-bottom: 20px;">
             <label style="display: block; margin-bottom: 8px; font-weight: 600;">Password</label>
-            <input type="password" name="password" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box;">
+            <input type="password" name="password" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box;" placeholder="Enter your password">
         </div>
+        
         <button type="submit" style="width: 100%; padding: 14px; background: #0f9d58; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">Login</button>
     </form>
-    <p style="text-align: center; margin-top: 20px; color: #666;">Don't have an account? <a href="/register/" style="color: #0f9d58; font-weight: bold;">Sign up</a></p>
+        <p style="text-align: center; margin-top: 20px; color: #666;">Don't have an account? <a href="/register/" style="color: #0f9d58; font-weight: bold;">Sign up</a></p>
 </div>
 {% endblock %}

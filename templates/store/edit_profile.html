@@ -1,0 +1,24 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="container" style="max-width: 500px; margin: 50px auto;">
+    <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <h2 style="margin-top: 0;">Edit Profile</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 600; font-size: 0.9rem;">First Name</label>
+                <input type="text" name="first_name" value="{{ user.first_name }}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: 600; font-size: 0.9rem;">Last Name</label>
+                <input type="text" name="last_name" value="{{ user.last_name }}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: 600; font-size: 0.9rem;">Phone Number</label>
+                <input type="text" name="phone" value="{{ user.phone }}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+            </div>
+            <button type="submit" style="background: #0f9d58; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; width: 100%; cursor: pointer;">Save Changes</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 50px auto;">
+    <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin-top: 0; color: #1f2937;">My Account</h2>
+            <a href="{% url 'edit_profile' %}" style="color: #0f9d58; font-weight: bold; text-decoration: none;">Edit Profile</a>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <div style="margin-bottom: 20px;">
+                <label style="font-size: 0.85rem; color: #6b7280; font-weight: 600;">Full Name</label>
+                <p style="margin: 5px 0 0 0; font-size: 1.1rem;">{{ user.first_name }} {{ user.last_name }}</p>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-size: 0.85rem; color: #6b7280; font-weight: 600;">Email Address</label>
+                <p style="margin: 5px 0 0 0; font-size: 1.1rem;">{{ user.email }}</p>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-size: 0.85rem; color: #6b7280; font-weight: 600;">Phone Number</label>
+                <p style="margin: 5px 0 0 0; font-size: 1.1rem;">{{ user.phone|default:"Not provided" }}</p>
+            </div>
+        </div>
+        
+        <div style="border-top: 1px solid #e5e7eb; margin-top: 30px; padding-top: 20px;">
+            <a href="{% url 'my_orders' %}" style="background: #0f9d58; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
+                📦 View My Orders
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
