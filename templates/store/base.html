@@ -13,8 +13,8 @@
         .top-bar a { color: #9ca3af; text-decoration: none; margin-left: 15px; }
         .top-bar a:hover { color: white; }
 
-        .navbar { background: #ffffff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; height: 72px; box-sizing: border-box; }
-        .logo { font-size: 1.8rem; font-weight: 900; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .navbar { background: #ffffff; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; height: 98px; box-sizing: border-box; }
+        .logo { font-size: 2.2rem; font-weight: 900; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
         
         .search-bar { flex: 1; max-width: 500px; display: flex; margin: 0 30px; }
         .search-bar input { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px 0 0 8px; outline: none; }
@@ -60,13 +60,68 @@
         .category-bar a { text-decoration: none; color: #555; font-weight: 600; padding: 15px 0; font-size: 0.95rem; border-bottom: 3px solid transparent; transition: 0.2s; }
         .category-bar a:hover { color: var(--primary); border-bottom-color: var(--primary); }
 
-        .container { max-width: 1400px; margin: 40px auto; padding: 0 5%; flex: 1; width: 100%; box-sizing: border-box; }
+        .container { max-width: 1400px; margin: 20px auto; padding: 0 5%; flex: 1; width: 100%; box-sizing: border-box; }
 
         /* Modal Animation */
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
         /* SVG Icon styling */
         .svg-icon { width: 18px; height: 18px; stroke-width: 2; stroke: currentColor; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        
+
+        /* --- MOBILE RESPONSIVE DESIGN --- */
+        @media (max-width: 768px) {
+            /* 1. Stack the Navbar */
+            .navbar {
+                flex-direction: column;
+                height: auto;
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            .logo { font-size: 1.8rem; } /* Keep logo slightly smaller on mobile */
+            .search-bar { margin: 0; width: 100%; max-width: 100%; }
+            
+            /* 2. Wrap the action buttons nicely */
+            .nav-actions {
+                width: 100%;
+                justify-content: space-between;
+                gap: 10px;
+            }
+            .btn-cart, .account-btn, .btn-auth { padding: 0 10px; font-size: 0.85rem; }
+
+            /* 3. Make the Category Bar scrollable horizontally */
+            .category-bar {
+                overflow-x: auto;
+                white-space: nowrap;
+                padding: 0 15px;
+                gap: 15px;
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            }
+            .category-bar::-webkit-scrollbar { display: none; } /* Hide scrollbar */
+            .category-bar a { padding: 10px 0; }
+
+            /* 4. Adjust main container spacing */
+            .container { margin: 20px auto; padding: 0 15px; }
+
+            /* 5. Make Footer stack nicely */
+            footer > div:first-child {
+                grid-template-columns: 1fr !important;
+                gap: 30px;
+            }
+
+            /* 6. Make Product Grid show 2 items per row instead of 1 */
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 12px !important;
+            }
+            .card { padding: 10px !important; }
+            .card h3 { font-size: 0.95rem !important; }
+            .card .price { font-size: 1.1rem !important; }
+        }
+    
+    
+    
     </style>
 </head>
 <body>
@@ -126,7 +181,7 @@
     <!-- Main Navbar -->
     <nav class="navbar">
         <a href="/" class="logo">
-            <svg class="svg-icon" style="width: 28px; height: 28px;" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+            <svg class="svg-icon" style="width: 40px; height: 28px;" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             RumiMart
         </a>
         
@@ -165,8 +220,9 @@
                         <a href="{% url 'my_orders' %}">
                             <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg> My Orders
                         </a>
-                        <a href="#">
+                        <a href="{% url 'wishlist' %}">
                             <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg> Wishlist
+                        </a>
                         </a>
                         
                         <div style="border-top: 1px solid #f3f4f6; margin: 5px 0;"></div>
@@ -203,6 +259,12 @@
         {% endfor %}
     </div>
 
+    <!-- 👇 SAME DAY DELIVERY TAG (After Category Bar) 👇 -->
+    <div style="background: #f59e0b; color: white; text-align: center; padding: 6px; font-size: 0.85rem; font-weight: 600; display: flex; justify-content: center; align-items: center; gap: 6px;">
+        <svg class="svg-icon" style="width: 14px; height: 20px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        Same Day Delivery Available on all orders!
+    </div>
+
     <!-- Main Content -->
     <main class="container">
         {% block content %}{% endblock %}
@@ -216,7 +278,7 @@
     </a>
 
     <!-- Premium Footer -->
-    <footer style="background: #111827; color: #9ca3af; padding: 50px 5% 20px; margin-top: auto;">
+    <footer style="background: #0f9d58; color: #f4f5f7; padding: 50px 5% 20px; margin-top: auto;">
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; max-width: 1400px; margin: 0 auto 40px;">
             <div>
                 <h3 style="color: white; margin-top: 0; font-size: 1.5rem; display: flex; align-items: center; gap: 8px;">

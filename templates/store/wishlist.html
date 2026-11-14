@@ -1,0 +1,30 @@
+{% extends 'store/base.html' %}
+{% block title %}My Wishlist | Mini Mart{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1200px; margin: 40px auto;">
+    <h2 style="margin-bottom: 30px; color: #1f2937;">❤️ My Wishlist</h2>
+    
+    <div class="product-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;">
+        {% for product in products %}
+        <div class="card" style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 15px; display: flex; flex-direction: column;">
+            <div style="height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                {% else %}
+                    <img src="https://via.placeholder.com/150?text=No+Image" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                {% endif %}
+            </div>
+            <h3 style="font-size: 1.05rem; font-weight: 600; color: #1f2937; margin: 0 0 5px 0;">{{ product.name }}</h3>
+            <div style="font-size: 1.25rem; font-weight: 800; color: #1f2937; margin-bottom: 15px;">₹{{ product.price }}</div>
+            <a href="{% url 'add_to_cart' product.id %}" style="background: #ecfdf5; color: #0f9d58; border: 1px solid #0f9d58; padding: 10px; border-radius: 8px; text-align: center; text-decoration: none; font-weight: bold; margin-top: auto;">Add to Cart</a>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 50px; background: white; border-radius: 12px;">
+            <h3 style="color: #6b7280;">Your wishlist is empty.</h3>
+            <a href="/" style="color: #0f9d58; font-weight: bold;">Go Shopping</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

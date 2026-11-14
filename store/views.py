@@ -387,6 +387,7 @@ def edit_profile(request):
         return redirect('profile')
     return render(request, 'store/edit_profile.html')
 
+@login_required(login_url='/login/')
 def add_to_wishlist(request, product_id):
     # Get the current wishlist from the session, or create an empty list
     wishlist = request.session.get('wishlist', [])
@@ -400,3 +401,9 @@ def add_to_wishlist(request, product_id):
         
     # Redirect them back to the page they were on
     return redirect(request.META.get('HTTP_REFERER', 'shop'))
+
+@login_required(login_url='/login/')
+def wishlist(request):
+    wishlist_ids = request.session.get('wishlist', [])
+    products = Product.objects.filter(id__in=wishlist_ids)
+    return render(request, 'store/wishlist.html', {'products': products})
