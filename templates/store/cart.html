@@ -99,11 +99,23 @@
                 </div>
                 
                 <!-- Total & Remove -->
-                <div class="item-actions">
+                <div class="item-actions" style="display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end;">
                     <p class="item-total">₹{{ item.total }}</p>
-                    <a href="{% url 'remove_from_cart' item.product.id %}" class="remove-btn">Remove</a>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                        <!-- Move to Wishlist Button -->
+                        <a href="{% url 'move_to_wishlist' item.product.id %}" style="color: #0f9d58; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                            Save for Later
+                        </a>
+                        
+                        <!-- Remove Button -->
+                        <a href="{% url 'remove_from_cart' item.product.id %}" class="remove-btn">
+                            Remove
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </div> 
             {% endfor %}
         {% else %}
             <div style="text-align: center; padding: 60px 20px;">
@@ -128,6 +140,30 @@
             {% else %}
                 <div class="delivery-text">Add ₹{{ 500|add:"-"|add:total_price }} more for FREE delivery.</div>
                 <div class="progress-bar"><div class="progress-fill" style="width: {% widthratio total_price 500 100 %}%;"></div></div>
+            {% endif %}
+        </div>
+
+                <!-- Promo Code Section -->
+        <div style="margin-bottom: 20px; border-bottom: 1px dashed #e5e7eb; padding-bottom: 15px;">
+            {% if request.session.coupon_id %}
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #f0fdf4; padding: 10px; border-radius: 6px; border: 1px solid #bbf7d0;">
+                    <span style="color: #166534; font-weight: 600; font-size: 0.9rem;">Coupon Applied</span>
+                    <a href="{% url 'remove_coupon' %}" style="color: #ef4444; font-size: 0.8rem; text-decoration: none; font-weight: bold;">Remove</a>
+                </div>
+            {% else %}
+                <form method="POST" action="{% url 'apply_coupon' %}" style="display: flex; gap: 8px;">
+                    {% csrf_token %}
+                    <input type="text" name="coupon_code" placeholder="Promo Code" style="flex: 1; padding: 8px; border: 1px solid {% if coupon_error %}#ef4444{% else %}#ddd{% endif %}; border-radius: 6px; text-transform: uppercase; font-size: 0.9rem; outline: none;">
+                    <button type="submit" style="background: #1f2937; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; cursor: pointer;">Apply</button>
+                </form>
+                
+                <!-- 👇 SHOW ERROR HERE 👇 -->
+                {% if coupon_error %}
+                    <p style="color: #ef4444; font-size: 0.8rem; margin-top: 5px; font-weight: 600;">
+                        {{ coupon_error }}
+                    </p>
+                {% endif %}
+                
             {% endif %}
         </div>
 

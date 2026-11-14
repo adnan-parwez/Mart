@@ -10,7 +10,9 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #f3f4f6; padding-bottom: 15px; margin-bottom: 15px;">
             <div>
                 <h3 style="margin: 0 0 5px 0; color: #1f2937;">Order #{{ order.id }}</h3>
-                <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">Placed on {{ order.created_at|date:"M d, Y" }}</p>
+                <p style="margin: 0; color: #6b7280; font-size: 0.9rem;">
+    Placed on {{ order.created_at|date:"M d, Y" }} at {{ order.created_at|time:"h:i A" }}
+</p>
             </div>
             <div style="text-align: right;">
                 <h4 style="margin: 0 0 5px 0;">₹{{ order.total_price }}</h4>

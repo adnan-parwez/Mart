@@ -2,86 +2,129 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Invoice #{{ order.id }} | Mini Mart</title>
+    <title>Invoice #{{ order.id }} | RumiMart</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f3f4f6; padding: 40px; margin: 0; }
-        .invoice { max-width: 700px; margin: auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-top: 5px solid #0f9d58; }
-        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
-        .header h1 { margin: 0; color: #0f9d58; }
-        .details { display: flex; justify-content: space-between; margin-bottom: 30px; color: #555; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; }
-        .total-row { text-align: right; font-size: 1.2rem; font-weight: bold; margin-top: 20px; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f3f4f6; margin: 0; padding: 40px; }
+        .a4-page { width: 210mm; min-height: 297mm; margin: auto; background: white; padding: 20mm; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
-        .action-bar { text-align: center; margin-top: 30px; }
-        .btn { background: #1f2937; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; margin: 0 10px; }
-        .btn-outline { background: white; color: #1f2937; border: 2px solid #1f2937; }
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f9d58; padding-bottom: 20px; margin-bottom: 30px; }
+        .logo-area h1 { margin: 0; color: #0f9d58; font-size: 2rem; font-weight: 900; }
+        .logo-area p { margin: 5px 0 0 0; color: #6b7280; font-size: 0.9rem; }
+        .invoice-title { text-align: right; }
+        .invoice-title h2 { margin: 0; color: #1f2937; font-size: 1.8rem; letter-spacing: 2px; text-transform: uppercase; }
+        .invoice-title p { margin: 5px 0 0 0; color: #6b7280; font-size: 0.9rem; }
 
+        /* Details Grid */
+        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+        .details-box h4 { margin: 0 0 10px 0; color: #9ca3af; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+        .details-box p { margin: 0 0 5px 0; color: #1f2937; font-size: 0.95rem; line-height: 1.6; }
+        .details-box strong { color: #111827; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th { background: #f9fafb; color: #4b5563; padding: 12px 15px; text-align: left; font-size: 0.85rem; text-transform: uppercase; border-bottom: 2px solid #e5e7eb; border-top: 2px solid #e5e7eb; }
+        td { padding: 15px; border-bottom: 1px solid #f3f4f6; color: #374151; font-size: 0.95rem; }
+        .text-right { text-align: right; }
+
+        /* Totals */
+        .totals { width: 50%; margin-left: auto; }
+        .total-row { display: flex; justify-content: space-between; padding: 10px 0; color: #4b5563; font-size: 0.95rem; }
+        .grand-total { border-top: 2px solid #0f9d58; margin-top: 10px; padding-top: 15px; color: #0f9d58; font-weight: 800; font-size: 1.3rem; }
+
+        /* Footer */
+        .footer { margin-top: 50px; text-align: center; color: #9ca3af; font-size: 0.85rem; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+
+        /* Print Settings */
         @media print {
             body { background: white; padding: 0; }
-            .invoice { box-shadow: none; border: none; padding: 0; border-top: none; }
-            .action-bar { display: none !important; }
+            .a4-page { box-shadow: none; padding: 0; width: 100%; }
+            .no-print { display: none !important; }
         }
     </style>
 </head>
 <body>
-    <div class="invoice">
+
+    <div class="no-print" style="text-align: center; margin-bottom: 20px;">
+        <button onclick="window.print()" style="background: #0f9d58; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer;">🖨️ Print / Save as PDF</button>
+        <a href="{% url 'my_orders' %}" style="margin-left: 15px; color: #6b7280; text-decoration: none; font-weight: 600;">← Back to Orders</a>
+    </div>
+
+    <div class="a4-page">
+        <!-- Header -->
         <div class="header">
-            <div>
-                <h1>INVOICE</h1>
-                <p><strong>Order #{{ order.id }}</strong></p>
+            <div class="logo-area">
+                <h1>🛒 RumiMart</h1>
+                <p>Your Daily Needs, Delivered.</p>
             </div>
-            <div style="text-align: right;">
-                <h3 style="margin: 0; color: #1f2937;">Mini Mart</h3>
-                <p>Date: {{ order.created_at|date:"M d, Y" }}</p>
-            </div>
-        </div>
-
-        <div class="details">
-            <div>
-                <strong>Billed To:</strong><br>
-                {{ order.first_name }} {{ order.last_name }}<br>
-                {{ order.email }}<br>
-                {{ order.address }}<br>
-                {{ order.city }} - {{ order.pincode }}
-            </div>
-            <div style="text-align: right;">
-                <strong>Payment Method:</strong><br>
-                {{ order.payment_method }}<br>
-                <strong>Status:</strong> <span style="color: #0f9d58; font-weight: bold;">Paid</span>
+            <div class="invoice-title">
+                <h2>Invoice</h2>
+                <p><strong>Order #:</strong> {{ order.id }}</p>
+                <p><strong>Date:</strong> {{ order.created_at|date:"M d, Y" }} at {{ order.created_at|time:"h:i A" }}</p>
             </div>
         </div>
 
+        <!-- Details -->
+        <div class="details-grid">
+            <div class="details-box">
+                <h4>Billed To:</h4>
+                <p><strong>{{ order.first_name }} {{ order.last_name }}</strong></p>
+                <p>{{ order.address }}</p>
+                <p>{{ order.city }} - {{ order.pincode }}</p>
+            </div>
+            <div class="details-box" style="text-align: right;">
+                <h4>Contact & Payment:</h4>
+                <p><strong>Phone:</strong> {{ order.phone }}</p>
+                <p><strong>Email:</strong> {{ order.email }}</p>
+                <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+                <p><strong>Status:</strong> <span style="color: #0f9d58; font-weight: bold;">Paid</span></p>
+            </div>
+        </div>
+
+        <!-- Items Table -->
         <table>
             <thead>
                 <tr>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Total</th>
+                    <th>Item Description</th>
+                    <th class="text-right">Price</th>
+                    <th class="text-right">Qty</th>
+                    <th class="text-right">Total</th>
                 </tr>
             </thead>
             <tbody>
                 {% for item in order.items.all %}
                 <tr>
                     <td>{{ item.product.name }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>₹{{ item.price }}</td>
-                    <td>₹{{ item.price|floatformat:2 }}</td> 
+                    <td class="text-right">₹{{ item.price }}</td>
+                    <td class="text-right">{{ item.quantity }}</td>
+                    <td class="text-right">₹{{ item.price|floatformat:2 }}</td> 
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <div class="total-row">
-            Grand Total: ₹{{ order.total_price }}
+        <!-- Totals -->
+        <div class="totals">
+            <div class="total-row">
+                <span>Subtotal</span>
+                <span>₹{{ order.total_price }}</span>
+            </div>
+            <div class="total-row">
+                <span>Tax</span>
+                <span>Included</span>
+            </div>
+            <div class="total-row grand-total">
+                <span>Grand Total</span>
+                <span>₹{{ order.total_price }}</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Thank you for shopping with RumiMart!</p>
+            <p>If you have any questions, contact us at support@rumimart.com</p>
         </div>
     </div>
 
-    <!-- Action Buttons (Hidden when printing) -->
-    <div class="action-bar">
-        <a href="{% url 'my_orders' %}" class="btn btn-outline">← Back to Orders</a>
-        <button onclick="window.print()" class="btn">🖨️ Print / Save as PDF</button>
-    </div>
 </body>
 </html>

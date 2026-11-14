@@ -40,5 +40,14 @@ urlpatterns = [
     path('profile/edit/', views.edit_profile, name='edit_profile'),
     path('wishlist/add/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
     path('wishlist/', views.wishlist, name='wishlist'),
+    path('dashboard/customers/edit/<int:user_id>/', views.edit_customer, name='edit_customer'),
+    path('dashboard/customers/delete/<int:user_id>/', views.delete_customer, name='delete_customer'),
+    path('cart/move-to-wishlist/<int:product_id>/', views.move_to_wishlist, name='move_to_wishlist'),
+    path('cart/apply-coupon/', views.apply_coupon, name='apply_coupon'),
+    path('cart/remove-coupon/', views.remove_coupon, name='remove_coupon'),
+    path('dashboard/coupons/', views.manage_coupons, name='manage_coupons'),
+    path('dashboard/coupons/add/', views.add_coupon, name='add_coupon'),
+    path('dashboard/coupons/edit/<int:coupon_id>/', views.edit_coupon, name='edit_coupon'),
+    path('dashboard/coupons/delete/<int:coupon_id>/', views.delete_coupon, name='delete_coupon'),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

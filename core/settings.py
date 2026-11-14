@@ -122,16 +122,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
-# Email
-# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
-
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
-    },
-}
-
 # --- CUSTOM SETTINGS ---
 UPI_ID = "parwez.adnan@ybl"  # <--- REPLACE WITH YOUR REAL UPI ID (e.g., 9876543210@ybl)
 UPI_NAME = "Adnan Parwez"
@@ -144,7 +134,7 @@ MAILERS = {
             "host": "smtp.gmail.com",
             "port": 587,
             "username": "adnan.uc3m@gmail.com",      # <-- Your Gmail
-            "password": "lqna jsbk mtiv ajyk",       # <-- Your 16-letter App Password
+            "password": "yvre jknc lhxx gucb",       # <-- Your 16-letter App Password
             "use_tls": True,
         },
     },

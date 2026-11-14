@@ -11,10 +11,9 @@ from .models import Product, Order, OrderItem, CustomUser
 from django.core.mail import EmailMultiAlternatives # <-- Put it here!
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
-from .models import Product, Order, OrderItem
+from django.utils import timezone
+from .models import Product, Order, OrderItem, CustomUser, Address, Coupon
 from .forms import ProductForm, CustomUserCreationForm
-# ==========================================
 # 1. STOREFRONT VIEWS
 # ==========================================
 
@@ -69,14 +68,43 @@ def remove_from_cart(request, product_id):
 def cart_detail(request):
     cart = request.session.get('cart', {})
     cart_items = []
-    total_price = 0
+    subtotal = 0
+    
     for product_id, quantity in cart.items():
         product = get_object_or_404(Product, id=product_id)
         item_total = product.price * quantity
-        total_price += item_total
+        subtotal += item_total
         cart_items.append({'product': product, 'quantity': quantity, 'total': item_total})
-    return render(request, 'store/cart.html', {'cart_items': cart_items, 'total_price': total_price})
+        
+    coupon_id = request.session.get('coupon_id')
+    coupon_error = request.session.pop('coupon_error', None) # 👈 GET AND CLEAR ERROR
+    discount_amount = 0
+    total_price = subtotal
+    
+    if coupon_id:
+        try:
+            coupon = Coupon.objects.get(id=coupon_id, active=True)
+            if coupon.discount_type == 'percentage':
+                discount_amount = (subtotal * coupon.discount_value) / 100
+            else:
+                discount_amount = coupon.discount_value
+            if discount_amount > subtotal:
+                discount_amount = subtotal
+            total_price = subtotal - discount_amount
+        except Coupon.DoesNotExist:
+            del request.session['coupon_id']
 
+    delivery_fee = 0 if total_price >= 500 else 10
+    final_total = total_price + delivery_fee
+
+    return render(request, 'store/cart.html', {
+        'cart_items': cart_items, 
+        'subtotal': subtotal,
+        'total_price': final_total,
+        'discount_amount': discount_amount,
+        'delivery_fee': delivery_fee,
+        'coupon_error': coupon_error # 👈 PASS TO TEMPLATE
+    })
 # ==========================================
 # 3. CHECKOUT & UPI PAYMENT VIEWS
 # ==========================================
@@ -91,6 +119,11 @@ from .models import Order, OrderItem, Product, Address, CustomUser
 import uuid
 
 def checkout(request):
+
+    if request.user.is_authenticated and request.user.is_staff:
+        messages.info(request, "Admins cannot place orders. You are being redirected to the dashboard.")
+        return redirect('dashboard')
+    
     cart = request.session.get('cart', {})
     if not cart: 
         return redirect('shop')
@@ -141,6 +174,9 @@ def checkout(request):
                     first_name=full_name.split(' ')[0],
                     phone=phone
                 )
+        if not (full_name and phone and email and len(phone) == 10):
+            messages.error(request, "Please provide a valid name, 10-digit phone number, and email.")
+            return redirect('checkout')
         
         # 2. SAVE ADDRESS TO PROFILE (If they don't have it)
         if delivery_type == 'home' and address_str and user:
@@ -317,7 +353,7 @@ def confirm_payment_and_send_invoice(request, order_id):
     plain_message = strip_tags(html_message)
     
     email = EmailMultiAlternatives(
-        subject, plain_message, 'your_email@gmail.com', [order.email]
+        subject, plain_message, 'adnan.uc3m@gmail.com', [order.email]
     )
     email.attach_alternative(html_message, "text/html")
     email.send()
@@ -407,3 +443,115 @@ def wishlist(request):
     wishlist_ids = request.session.get('wishlist', [])
     products = Product.objects.filter(id__in=wishlist_ids)
     return render(request, 'store/wishlist.html', {'products': products})
+
+@staff_member_required
+def edit_customer(request, user_id):
+    customer = get_object_or_404(CustomUser, id=user_id, is_staff=False)
+    
+    if request.method == 'POST':
+        customer.first_name = request.POST.get('first_name')
+        customer.last_name = request.POST.get('last_name')
+        customer.email = request.POST.get('email')
+        customer.phone = request.POST.get('phone')
+        customer.save()
+        messages.success(request, "Customer details updated successfully!")
+        return redirect('manage_customers')
+        
+    return render(request, 'store/edit_customer.html', {'customer': customer})
+
+@staff_member_required
+def delete_customer(request, user_id):
+    customer = get_object_or_404(CustomUser, id=user_id, is_staff=False)
+    customer.delete()
+    messages.success(request, "Customer removed successfully!")
+    return redirect('manage_customers')
+
+
+def move_to_wishlist(request, product_id):
+    # 1. Remove from Cart
+    cart = request.session.get('cart', {})
+    if str(product_id) in cart:
+        del cart[str(product_id)]
+    request.session['cart'] = cart
+
+    # 2. Add to Wishlist
+    wishlist = request.session.get('wishlist', [])
+    if product_id not in wishlist:
+        wishlist.append(product_id)
+        request.session['wishlist'] = wishlist
+        
+    messages.success(request, "Item moved to your Wishlist! ❤️")
+    return redirect('cart_detail')
+
+
+def apply_coupon(request):
+    if request.method == 'POST':
+        code = request.POST.get('coupon_code')
+        
+        # Calculate subtotal to check minimum order
+        cart = request.session.get('cart', {})
+        subtotal = 0
+        for product_id, quantity in cart.items():
+            product = get_object_or_404(Product, id=product_id)
+            subtotal += product.price * quantity
+            
+        try:
+            coupon = Coupon.objects.get(
+                code__iexact=code, 
+                active=True, 
+                valid_from__lte=timezone.now(), 
+                valid_to__gte=timezone.now()
+            )
+            if subtotal < coupon.minimum_order_value:
+                request.session['coupon_error'] = f"Minimum cart value of ₹{coupon.minimum_order_value} required."
+            else:
+                request.session['coupon_id'] = coupon.id
+                request.session['coupon_error'] = None
+                messages.success(request, f"Coupon '{coupon.code}' applied successfully!")
+        except Coupon.DoesNotExist:
+            request.session['coupon_error'] = "Invalid coupon code."
+            
+    return redirect('cart_detail')
+
+def remove_coupon(request):
+    if 'coupon_id' in request.session:
+        del request.session['coupon_id']
+        messages.info(request, "Coupon removed.")
+    return redirect('cart_detail')
+
+@staff_member_required
+def manage_coupons(request):
+    coupons = Coupon.objects.all().order_by('-id')
+    return render(request, 'store/manage_coupons.html', {'coupons': coupons})
+
+@staff_member_required
+def add_coupon(request):
+    if request.method == 'POST':
+        form = CouponForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Coupon created successfully!")
+            return redirect('manage_coupons')
+    else:
+        form = CouponForm()
+    return render(request, 'store/coupon_form.html', {'form': form, 'title': 'Create Coupon'})
+
+@staff_member_required
+def edit_coupon(request, coupon_id):
+    coupon = get_object_or_404(Coupon, id=coupon_id)
+    if request.method == 'POST':
+        form = CouponForm(request.POST, instance=coupon)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Coupon updated successfully!")
+            return redirect('manage_coupons')
+    else:
+        form = CouponForm(instance=coupon)
+    return render(request, 'store/coupon_form.html', {'form': form, 'title': 'Edit Coupon'})
+
+@staff_member_required
+def delete_coupon(request, coupon_id):
+    coupon = get_object_or_404(Coupon, id=coupon_id)
+    coupon.delete()
+    messages.success(request, "Coupon deleted successfully!")
+    return redirect('manage_coupons')

@@ -29,7 +29,7 @@
 <!-- Main Product Grid -->
 <div class="product-grid">
     {% for product in products %}
-    <div class="card" style="position: relative; ...">
+    <div class="card" style="position: relative;">
         
                 <!-- Wishlist Heart Icon -->
         <a href="{% url 'add_to_wishlist' product.id %}" style="position: absolute; top: 10px; right: 10px; background: white; border: 1px solid #e5e7eb; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s; text-decoration: none;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='white'">

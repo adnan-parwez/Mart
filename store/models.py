@@ -99,3 +99,38 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"
+
+
+class Coupon(models.Model):
+    DISCOUNT_TYPES = (
+        ('percentage', 'Percentage (%)'),
+        ('flat', 'Flat Amount (₹)'),
+    )
+    code = models.CharField(max_length=50, unique=True)
+    discount_type = models.CharField(max_length=20, choices=DISCOUNT_TYPES, default='percentage')
+    discount_value = models.DecimalField(max_digits=10, decimal_places=2, help_text="Enter 10 for 10% or 50 for ₹50")
+    minimum_order_value = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Minimum cart value required to use this coupon")
+    active = models.BooleanField(default=True)
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+
+    def __str__(self):
+        if self.discount_type == 'percentage':
+            return f"{self.code} - {self.discount_value}% off"
+        return f"{self.code} - ₹{self.discount_value} off"
+    
+from django import forms
+from .models import Coupon
+
+class CouponForm(forms.ModelForm):
+    class Meta:
+        model = Coupon
+        fields = ['code', 'discount_type', 'discount_value', 'minimum_order_value', 'active', 'valid_from', 'valid_to']
+        widgets = {
+            'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. RUMI10'}),
+            'discount_type': forms.Select(attrs={'class': 'form-control'}),
+            'discount_value': forms.NumberInput(attrs={'class': 'form-control'}),
+            'minimum_order_value': forms.NumberInput(attrs={'class': 'form-control'}),
+            'valid_from': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'valid_to': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+        }

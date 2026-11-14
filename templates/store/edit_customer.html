@@ -1,0 +1,37 @@
+{% extends 'store/base.html' %}
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+    <h2 style="margin-top: 0; color: #1f2937;">Edit Customer</h2>
+    <p style="color: #6b7280; margin-bottom: 25px;">Update the details for <strong>{{ customer.email }}</strong></p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+            <div>
+                <label style="font-weight: 600; font-size: 0.9rem;">First Name</label>
+                <input type="text" name="first_name" value="{{ customer.first_name }}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+            </div>
+            <div>
+                <label style="font-weight: 600; font-size: 0.9rem;">Last Name</label>
+                <input type="text" name="last_name" value="{{ customer.last_name }}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <label style="font-weight: 600; font-size: 0.9rem;">Email Address</label>
+            <input type="email" name="email" value="{{ customer.email }}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+        </div>
+        
+        <div style="margin-bottom: 25px;">
+            <label style="font-weight: 600; font-size: 0.9rem;">Phone Number</label>
+            <input type="text" name="phone" value="{{ customer.phone }}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 5px;">
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" style="flex: 1; background: #0f9d58; color: white; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Save Changes</button>
+            <a href="{% url 'manage_customers' %}" style="flex: 1; text-align: center; background: #f3f4f6; color: #374151; padding: 12px; border-radius: 6px; font-weight: bold; text-decoration: none; border: 1px solid #d1d5db;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
