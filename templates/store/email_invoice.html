@@ -112,13 +112,13 @@
 
             <div class="btn-container">
                 <!-- Single button to view order/invoice -->
-                <a href="https://rumimart.onrender.com/order/status/{{ order.id }}/?email={{ order.email|urlencode }}" class="btn">View Your Order</a>
+                <a href="https://mart-q2d5.onrender.com/order/status/{{ order.id }}/?email={{ order.email|urlencode }}" class="btn">View Your Order</a>
                 
                 <!-- Only show this if the user hasn't set a password yet -->
                 {% if not order.user.last_login or not order.user.has_usable_password %}
                     <br><br>
                     <p style="font-size: 14px; color: #6b7280; margin-bottom: 10px;">Want to track your future orders easily?</p>
-                    <a href="https://rumimart.onrender.com/set-password/{{ order.id }}/" style="background: #ffffff; color: #0f9d58; border: 2px solid #0f9d58; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; display: inline-block;">
+                    <a href="https://mart-q2d5.onrender.com/set-password/{{ order.id }}/" style="background: #ffffff; color: #0f9d58; border: 2px solid #0f9d58; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; display: inline-block;">
                         Create an Account
                     </a>
                 {% endif %}
