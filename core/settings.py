@@ -28,7 +28,18 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "cloudinary",
     'store',
+    "anymail",
 ]
+
+ANYMAIL = {
+    "MAILJET_API_KEY": "8af9fc69baf22af59be8a13eb440431e",
+    "MAILJET_SECRET_KEY": "d63e1bc61e38ac4b80bf0c9b124e9667",
+}
+
+EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
+
+# This is the default "from" address. It MUST match the one you verified in Phase 1.
+DEFAULT_FROM_EMAIL = "adnan.uc3m@gmail.com"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

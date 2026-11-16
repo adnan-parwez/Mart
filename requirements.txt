@@ -7,5 +7,5 @@ pillow
 python-dotenv
 cloudinary
 django-cloudinary-storage
-weasyprint
 xhtml2pdf
+django-anymail[mailjet]
