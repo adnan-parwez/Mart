@@ -1,15 +1,52 @@
 {% extends 'store/base.html' %}
 {% block content %}
-<div style="max-width: 600px; margin: 40px auto; background: white; padding: 40px; border-radius: 12px; border: 1px solid #e5e7eb;">
-    <h2 style="margin-top: 0; margin-bottom: 20px;">{{ title }}</h2>
+<style>
+    .form-container { max-width: 800px; margin: 40px auto; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; overflow: hidden; }
+    .form-header { background: #f9fafb; padding: 25px 30px; border-bottom: 1px solid #e5e7eb; }
+    .form-header h2 { margin: 0; color: #1f2937; font-size: 1.5rem; }
+    .form-header p { margin: 5px 0 0 0; color: #6b7280; font-size: 0.9rem; }
+    
+    .form-body { padding: 30px; }
+    
+    /* Style the Django Form Paragraphs */
+    .form-body p { margin-bottom: 20px; display: flex; flex-direction: column; }
+    .form-body label { font-weight: 600; font-size: 0.9rem; color: #374151; margin-bottom: 8px; }
+    
+    .form-body input[type="text"], 
+    .form-body input[type="number"], 
+    .form-body input[type="datetime-local"], 
+    .form-body select {
+        width: 100%; padding: 12px 15px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; color: #1f2937; background: #f9fafb; box-sizing: border-box; outline: none; transition: 0.2s;
+    }
+    .form-body input:focus, .form-body select:focus { border-color: #0f9d58; background: white; box-shadow: 0 0 0 3px rgba(15, 157, 88, 0.1); }
+    
+    .form-body input[type="checkbox"] { width: 20px; height: 20px; margin-top: 5px; cursor: pointer; accent-color: #0f9d58; }
+
+    /* Make specific fields span 2 columns */
+    .form-body p:has(input[type="datetime-local"]) { display: inline-flex; width: 48%; margin-right: 3%; vertical-align: top; }
+    .form-body p:has(input[type="datetime-local"]):last-of-type { margin-right: 0; }
+
+    .form-footer { background: #f9fafb; padding: 20px 30px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+    .btn-cancel { color: #6b7280; text-decoration: none; font-weight: 600; }
+    .btn-save { background: #0f9d58; color: white; padding: 12px 30px; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+    .btn-save:hover { background: #0b7a43; }
+</style>
+
+<div class="form-container">
+    <div class="form-header">
+        <h2>{{ title }}</h2>
+        <p>Configure your discount rules and validity below.</p>
+    </div>
+    
     <form method="POST">
         {% csrf_token %}
-        <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="form-body">
             {{ form.as_p }}
         </div>
-        <div style="margin-top: 25px; display: flex; gap: 10px;">
-            <button type="submit" style="background: #0f9d58; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Save Coupon</button>
-            <a href="{% url 'manage_coupons' %}" style="background: #f3f4f6; color: #374151; padding: 12px 20px; border-radius: 6px; font-weight: bold; text-decoration: none;">Cancel</a>
+        
+        <div class="form-footer">
+            <a href="{% url 'manage_coupons' %}" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-save">Save Coupon</button>
         </div>
     </form>
 </div>

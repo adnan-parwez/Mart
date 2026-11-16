@@ -15,13 +15,17 @@
         
         <div style="margin-bottom: 20px;">
             <label style="display: block; margin-bottom: 8px; font-weight: 600;">Email Address</label>
-            <!-- Change name="username" to name="email" -->
             <input type="email" name="email" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box;" placeholder="Enter your email">
         </div>
         
-        <div style="margin-bottom: 20px;">
+        <div style="margin-bottom: 10px;"> <!-- Reduced margin here -->
             <label style="display: block; margin-bottom: 8px; font-weight: 600;">Password</label>
             <input type="password" name="password" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; box-sizing: border-box;" placeholder="Enter your password">
+        </div>
+
+        <!-- 👇 ADDED FORGOT PASSWORD LINK HERE 👇 -->
+        <div style="text-align: right; margin-bottom: 20px;">
+            <a href="{% url 'password_reset' %}" style="color: #0f9d58; font-size: 0.9rem; text-decoration: none; font-weight: 600;">Forgot Password?</a>
         </div>
         
         <button type="submit" style="width: 100%; padding: 14px; background: #0f9d58; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer;">Login</button>

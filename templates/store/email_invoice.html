@@ -1,53 +1,136 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <style>
-        body { font-family: Arial, sans-serif; background: #f3f4f6; padding: 20px; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; border-top: 5px solid #0f9d58; }
-        h1 { color: #0f9d58; margin-top: 0; }
-        .header { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { text-align: left; padding: 10px; border-bottom: 1px solid #eee; }
-        .total { text-align: right; font-size: 18px; font-weight: bold; margin-top: 20px; }
-        .btn { display: inline-block; padding: 12px 24px; background: #0f9d58; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px; }
+        body { font-family: Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 20px; }
+        .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        /* Header */
+        .header { background-color: #0f9d58; padding: 30px 20px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0; font-size: 24px; }
+        
+        /* Body */
+        .content { padding: 30px; }
+        .text { font-size: 15px; color: #4b5563; line-height: 1.6; margin-bottom: 20px; }
+
+        /* Email Tables */
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+        .data-table td { padding: 10px 0; border-bottom: 1px solid #f3f4f6; font-size: 14px; color: #1f2937; }
+        .data-table th { text-align: left; font-size: 12px; text-transform: uppercase; color: #9ca3af; border-bottom: 2px solid #e5e7eb; padding-bottom: 8px; }
+        
+        /* Summary Box */
+        .summary-box { background-color: #f9fafb; border: 1px solid #0f9d58; border-radius: 8px; padding: 15px; margin-top: 20px; }
+        .summary-table { width: 100%; border-collapse: collapse; }
+        .summary-table td { padding: 5px 0; font-size: 14px; }
+        .grand-total { font-size: 18px; font-weight: bold; color: #0f9d58; border-top: 1px solid #e5e7eb; padding-top: 10px !important; }
+        
+        /* Button */
+        .btn-container { text-align: center; margin-top: 30px; }
+        .btn { background-color: #0f9d58; color: #ffffff !important; text-decoration: none; padding: 14px 30px; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block; }
+        
+        /* Footer */
+        .footer { text-align: center; padding: 20px; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <div class="email-container">
+        <!-- Header -->
         <div class="header">
-            <h1>Payment Confirmed ✅</h1>
-            <p>Hi {{ order.first_name }},</p>
-            <p>Great news! We have received your payment of <strong>₹{{ order.total_price }}</strong> for Order <strong>#{{ order.id }}</strong>.</p>
+            <h1>RumiMart</h1>
         </div>
 
-        <h3>Order Summary:</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in order.items.all %}
-                <tr>
-                    <td>{{ item.product.name }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>₹{{ item.price }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <!-- Content -->
+        <div class="content">
+            <h2 style="color: #1f2937; margin-top: 0;">Payment Confirmed ✅</h2>
+            <div class="text">Hi <strong>{{ order.first_name }}</strong>,</div>
+            <div class="text">Thank you for shopping with RumiMart. We have received your payment of <strong>₹{{ order.total_price }}</strong>.</div>
 
-        <div class="total">
-            Total Paid: ₹{{ order.total_price }}
+            <!-- Order Details Table -->
+            <table class="data-table">
+                <tr>
+                    <td style="color: #6b7280;">Order ID:</td>
+                    <td style="text-align: right; font-weight: bold;">#{{ order.id }}</td>
+                </tr>
+                <tr>
+                    <td style="color: #6b7280;">Date:</td>
+                    <td style="text-align: right;">{{ order.created_at|date:"M d, Y" }}</td>
+                </tr>
+                <tr>
+                    <td style="color: #6b7280;">Payment Method:</td>
+                    <td style="text-align: right;">{{ order.payment_method }}</td>
+                </tr>
+            </table>
+
+            <!-- Items Table -->
+            <table class="data-table" style="margin-top: 30px;">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th style="text-align: center;">Qty</th>
+                        <th style="text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td style="text-align: center;">x{{ item.quantity }}</td>
+                        <td style="text-align: right; font-weight: bold;">₹{{ item.price|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Grand Total -->
+            <div class="summary-box">
+                <table class="summary-table">
+                    {% if order.discount_amount > 0 %}
+                    <tr>
+                        <td style="color: #0f9d58;">Discount:</td>
+                        <td style="text-align: right; color: #0f9d58;">- ₹{{ order.discount_amount|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td class="grand-total">Grand Total:</td>
+                        <td class="grand-total" style="text-align: right;">₹{{ order.total_price }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="text" style="text-align: center; margin-top: 20px; font-size: 13px; color: #9ca3af;">
+                Your official PDF invoice is attached to this email.
+            </div>
+
+            <!-- CTA Button -->
+                        <!-- ... (rest of your email above this) ... -->
+            
+            <div class="text" style="text-align: center; margin-top: 20px; font-size: 13px; color: #9ca3af;">
+                Your official PDF invoice is attached to this email.
+            </div>
+
+            <div class="btn-container">
+                <!-- Single button to view order/invoice -->
+                <a href="https://rumimart.onrender.com/order/status/{{ order.id }}/?email={{ order.email|urlencode }}" class="btn">View Your Order</a>
+                
+                <!-- Only show this if the user hasn't set a password yet -->
+                {% if not order.user.last_login or not order.user.has_usable_password %}
+                    <br><br>
+                    <p style="font-size: 14px; color: #6b7280; margin-bottom: 10px;">Want to track your future orders easily?</p>
+                    <a href="https://rumimart.onrender.com/set-password/{{ order.id }}/" style="background: #ffffff; color: #0f9d58; border: 2px solid #0f9d58; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: bold; display: inline-block;">
+                        Create an Account
+                    </a>
+                {% endif %}
+            </div>
         </div>
 
-        <p style="margin-top: 30px;">We will notify you once your order has been shipped.</p>
-        <p>Thank you for shopping with Mini Mart!</p>
-        
-        <a href=https://mart-q2d5.onrender.com/orders/{{ order.id }}/" class="btn">View Order in Store</a>
+        <!-- Footer -->
+        <div class="footer">
+            <p>If you have any questions, contact us at support@rumimart.com</p>
+            <p>© 2026 RumiMart. All rights reserved.</p>
+        </div>
     </div>
+
 </body>
 </html>

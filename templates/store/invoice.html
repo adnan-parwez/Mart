@@ -104,11 +104,20 @@
         </table>
 
         <!-- Totals -->
+        <!-- Totals -->
         <div class="totals">
             <div class="total-row">
                 <span>Subtotal</span>
-                <span>₹{{ order.total_price }}</span>
+                <span>₹{{ order.total_price|add:order.discount_amount }}</span> <!-- Shows original price -->
             </div>
+            
+            {% if order.discount_amount > 0 %}
+            <div class="total-row" style="color: #0f9d58; font-weight: bold;">
+                <span>Discount Applied</span>
+                <span>- ₹{{ order.discount_amount }}</span>
+            </div>
+            {% endif %}
+            
             <div class="total-row">
                 <span>Tax</span>
                 <span>Included</span>

@@ -183,6 +183,13 @@
             <span>Tax (Included)</span>
             <span>₹0</span>
         </div>
+
+        {% if discount_amount > 0 %}
+        <div class="summary-row" style="color: #0f9d58; font-weight: bold;">
+            <span>Coupon Discount</span>
+            <span>- ₹{{ discount_amount|floatformat:2 }}</span>
+        </div>
+        {% endif %}
         
         <div class="summary-total">
             <span>Total</span>

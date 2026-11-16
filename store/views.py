@@ -14,6 +14,9 @@ from django.utils.html import strip_tags
 from django.utils import timezone
 from .models import Product, Order, OrderItem, CustomUser, Address, Coupon
 from .forms import ProductForm, CustomUserCreationForm
+from .forms import ProductForm, CustomUserCreationForm, CouponForm
+import io
+from xhtml2pdf import pisa
 # 1. STOREFRONT VIEWS
 # ==========================================
 
@@ -70,14 +73,16 @@ def cart_detail(request):
     cart_items = []
     subtotal = 0
     
+    # 1. Calculate Subtotal
     for product_id, quantity in cart.items():
         product = get_object_or_404(Product, id=product_id)
         item_total = product.price * quantity
         subtotal += item_total
         cart_items.append({'product': product, 'quantity': quantity, 'total': item_total})
         
+    # 2. Calculate Coupon Discount
     coupon_id = request.session.get('coupon_id')
-    coupon_error = request.session.pop('coupon_error', None) # 👈 GET AND CLEAR ERROR
+    coupon_error = request.session.pop('coupon_error', None)
     discount_amount = 0
     total_price = subtotal
     
@@ -88,12 +93,15 @@ def cart_detail(request):
                 discount_amount = (subtotal * coupon.discount_value) / 100
             else:
                 discount_amount = coupon.discount_value
+                
             if discount_amount > subtotal:
                 discount_amount = subtotal
+                
             total_price = subtotal - discount_amount
         except Coupon.DoesNotExist:
             del request.session['coupon_id']
 
+    # 3. Calculate Delivery Fee
     delivery_fee = 0 if total_price >= 500 else 10
     final_total = total_price + delivery_fee
 
@@ -101,9 +109,9 @@ def cart_detail(request):
         'cart_items': cart_items, 
         'subtotal': subtotal,
         'total_price': final_total,
-        'discount_amount': discount_amount,
+        'discount_amount': discount_amount, # Passes the discount
         'delivery_fee': delivery_fee,
-        'coupon_error': coupon_error # 👈 PASS TO TEMPLATE
+        'coupon_error': coupon_error
     })
 # ==========================================
 # 3. CHECKOUT & UPI PAYMENT VIEWS
@@ -119,16 +127,14 @@ from .models import Order, OrderItem, Product, Address, CustomUser
 import uuid
 
 def checkout(request):
-
     if request.user.is_authenticated and request.user.is_staff:
         messages.info(request, "Admins cannot place orders. You are being redirected to the dashboard.")
         return redirect('dashboard')
-    
+
     cart = request.session.get('cart', {})
     if not cart: 
         return redirect('shop')
 
-    # Get saved addresses if the user is logged in
     saved_addresses = []
     if request.user.is_authenticated:
         saved_addresses = Address.objects.filter(user=request.user)
@@ -139,14 +145,13 @@ def checkout(request):
         phone = request.POST.get('phone')
         delivery_type = request.POST.get('delivery_type')
         address_id = request.POST.get('address_id')
-        
-        # Determine Address based on type
+
+        # --- Address Logic ---
         if delivery_type == 'store_pickup':
             address_str = "STORE PICKUP: RUMI MART"
             city = "Store Pickup"
             pincode = "000000"
         elif address_id and address_id != 'new':
-            # Use saved address
             addr = Address.objects.get(id=address_id)
             address_str = addr.address_line
             city = addr.city
@@ -154,39 +159,33 @@ def checkout(request):
             full_name = addr.full_name
             phone = addr.phone
         else:
-            # New address
             address_str = request.POST.get('address')
             city = request.POST.get('city')
             pincode = request.POST.get('pincode')
 
-        # 1. HANDLE GUEST ACCOUNT CREATION
+        # --- User Logic ---
+                # --- User Logic ---
         user = request.user if request.user.is_authenticated else None
         
         if not user:
-            # Check if user exists with this email
+            # Check if a user with this email already exists
             user = CustomUser.objects.filter(email=email).first()
+            
             if not user:
-                # Create new guest account
-                random_password = get_random_string(length=10)
-                user = CustomUser.objects.create_user(
-                    email=email,
-                    password=random_password,
-                    first_name=full_name.split(' ')[0],
-                    phone=phone
-                )
-        if not (full_name and phone and email and len(phone) == 10):
-            messages.error(request, "Please provide a valid name, 10-digit phone number, and email.")
-            return redirect('checkout')
-        
-        # 2. SAVE ADDRESS TO PROFILE (If they don't have it)
-        if delivery_type == 'home' and address_str and user:
-            Address.objects.get_or_create(
-                user=user,
-                address_line=address_str,
-                defaults={'full_name': full_name, 'phone': phone, 'city': city, 'pincode': pincode}
-            )
-
-        # 3. CREATE ORDER
+                # GUEST WITH NEW EMAIL: Check if they want an account
+                create_account = request.POST.get('create_account')
+                password = request.POST.get('password')
+                
+                if create_account and password:
+                    # They chose to create an account with a password
+                    user = CustomUser.objects.create_user(email=email, password=password, first_name=full_name.split(' ')[0], phone=phone)
+                    login(request, user) # Log them in automatically
+                else:
+                    # They are a pure guest. Create a user but make the password unusable.
+                    user = CustomUser.objects.create_user(email=email, first_name=full_name.split(' ')[0], phone=phone)
+                    user.set_unusable_password() # 👈 THIS IS THE MAGIC LINE
+                    user.save()
+        # --- Create Order ---
         order = Order.objects.create(
             user=user,
             first_name=full_name,
@@ -200,24 +199,73 @@ def checkout(request):
             is_paid=False
         )
 
-        # 4. MOVE CART TO ORDER
+        # --- Calculate Totals ---
         total_price = 0
         for product_id, quantity in cart.items():
             product = Product.objects.get(id=product_id)
             OrderItem.objects.create(order=order, product=product, price=product.price, quantity=quantity)
             total_price += product.price * quantity
+
+        # 👇 INITIALIZE DISCOUNT AMOUNT HERE 👇
+        discount_amount = 0
         
+        # Apply Coupon
+        coupon_id = request.session.get('coupon_id')
+        if coupon_id:
+            try:
+                coupon = Coupon.objects.get(id=coupon_id)
+                if coupon.discount_type == 'percentage':
+                    discount_amount = (total_price * coupon.discount_value) / 100
+                else:
+                    discount_amount = coupon.discount_value
+                
+                if discount_amount > total_price:
+                    discount_amount = total_price
+                    
+                total_price -= discount_amount
+            except Coupon.DoesNotExist:
+                pass
+
+        # Add Delivery Fee
+        if total_price < 500:
+            total_price += 10
+
+        # Save final amounts
         order.total_price = total_price
+        order.discount_amount = discount_amount # Now this is safe
         order.save()
-        request.session['cart'] = {} 
 
+        # Clear session
+        request.session['cart'] = {}
+        if 'coupon_id' in request.session:
+            del request.session['coupon_id']
+        if 'coupon_error' in request.session:
+            del request.session['coupon_error']
+
+        # Redirect to UPI or Pending
         if request.POST.get('payment_method') == 'UPI':
-            # Existing UPI logic...
-            pass
+            upi_url = f"upi://pay?pa={settings.UPI_ID}&pn={urllib.parse.quote(settings.UPI_NAME)}&am={total_price}&cu=INR&tn=Order_{order.id}"
+            qr_code_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={urllib.parse.quote(upi_url)}"
+            return render(request, 'store/upi_payment.html', {
+                'order': order, 'upi_id': settings.UPI_ID, 'qr_code_url': qr_code_url, 'total_price': total_price
+            })
             
-        return redirect('pending_page', order_id=order.id)
+        return render(request, 'store/pending.html', {'order': order})
 
-    return render(request, 'store/checkout.html', {'saved_addresses': saved_addresses})
+    # --- GET Request (Display Checkout Form) ---
+    cart_items = []
+    total_price = 0
+    for product_id, quantity in cart.items():
+        product = get_object_or_404(Product, id=product_id)
+        item_total = product.price * quantity
+        total_price += item_total
+        cart_items.append({'product': product, 'quantity': quantity, 'total': item_total})
+
+    return render(request, 'store/checkout.html', {
+        'saved_addresses': saved_addresses,
+        'cart_items': cart_items,
+        'total_price': total_price
+    })
 
 # ==========================================
 # 4. USER AUTHENTICATION VIEWS
@@ -344,22 +392,45 @@ def manage_orders(request):
 @staff_member_required
 def confirm_payment_and_send_invoice(request, order_id):
     order = get_object_or_404(Order, id=order_id)
+    
+    # 1. Mark as paid
     order.is_paid = True
     order.save()
 
-    # Email logic (assuming settings are correct)
-    subject = f"Payment Confirmed - Invoice for Order #{order.id}"
+    # 2. Calculate Subtotal for the PDF
+    subtotal = float(order.total_price) + float(order.discount_amount)
+
+    # 3. Generate the PDF
+    html_string = render_to_string('store/pdf_invoice.html', {
+        'order': order,
+        'subtotal': subtotal # 👈 Passing subtotal to fix the ₹0 bug
+    })
+    
+    pdf_file = io.BytesIO()
+    pisa_status = pisa.CreatePDF(html_string, dest=pdf_file)
+    
+    if pisa_status.err:
+        messages.error(request, "Error generating PDF invoice.")
+        return redirect('dashboard')
+        
+    pdf_file.seek(0)
+
+    # 4. Prepare the Premium Email
+    subject = f"🧾 Payment Confirmed - Invoice #{order.id}"
     html_message = render_to_string('store/email_invoice.html', {'order': order})
     plain_message = strip_tags(html_message)
     
+    # 5. Send Email
     email = EmailMultiAlternatives(
         subject, plain_message, 'adnan.uc3m@gmail.com', [order.email]
     )
     email.attach_alternative(html_message, "text/html")
+    email.attach(f"RumiMart_Invoice_{order.id}.pdf", pdf_file.getvalue(), "application/pdf")
+    
     email.send()
 
-    messages.success(request, f"Order #{order.id} confirmed & invoice sent!")
-    return redirect('dashboard') 
+    messages.success(request, f"Order #{order.id} confirmed & PDF invoice sent!")
+    return redirect('dashboard')
 
 def order_success(request, order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -395,15 +466,13 @@ def my_orders(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'store/my_orders.html', {'orders': orders})
 
-@login_required(login_url='/login/')
 def order_invoice(request, order_id):
-    # Get the order, but ensure it belongs to the logged-in user
-    order = get_object_or_404(Order, id=order_id, user=request.user)
+    order = get_object_or_404(Order, id=order_id)
     
-    # If it's not paid, don't let them see the final invoice
+    # Allow viewing if the order is paid (No login required for guests)
     if not order.is_paid:
         messages.warning(request, "Payment is still pending verification.")
-        return redirect('my_orders')
+        return redirect('shop')
         
     return render(request, 'store/invoice.html', {'order': order})
 
@@ -555,3 +624,38 @@ def delete_coupon(request, coupon_id):
     coupon.delete()
     messages.success(request, "Coupon deleted successfully!")
     return redirect('manage_coupons')
+
+def set_password_guest(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    user = order.user
+    
+    # If the user is already logged in as this user, just send them to orders
+    if request.user.is_authenticated and request.user.id == user.id:
+        return redirect('my_orders')
+
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        if len(password) >= 8:
+            user.set_password(password)
+            user.save()
+            login(request, user)
+            messages.success(request, "Account activated! Your order is now linked.")
+            return redirect('my_orders')
+        else:
+            messages.error(request, "Password must be at least 8 characters.")
+            
+    return render(request, 'store/set_password.html', {'order': order})
+
+def order_status(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    email_token = request.GET.get('email')
+    
+    if email_token == order.email:
+        if order.is_paid:
+            # 👇 Change this to 'success.html' 👇
+            return render(request, 'store/success.html', {'order': order})
+        else:
+            return render(request, 'store/pending.html', {'order': order})
+    else:
+        messages.error(request, "Unauthorized access. Please use the link from your email.")
+        return redirect('shop')

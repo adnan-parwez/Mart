@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @page { 
+            size: A4; 
+            margin: 20mm; 
+        }
+        body { 
+            font-family: Helvetica, Arial, sans-serif; 
+            color: #333; 
+            font-size: 12px; 
+            line-height: 1.5;
+        }
+        
+        /* Header */
+        .header-table { 
+            width: 100%; 
+            border-bottom: 2px solid #0f9d58; 
+            padding-bottom: 15px; 
+            margin-bottom: 30px; 
+        }
+        .logo { 
+            font-size: 28px; 
+            font-weight: bold; 
+            color: #0f9d58; 
+        }
+        .invoice-title { 
+            text-align: right; 
+            font-size: 22px; 
+            color: #1f2937; 
+            text-transform: uppercase; 
+        }
+        
+        /* Details Grid */
+        .details-table { 
+            width: 100%; 
+            margin-bottom: 30px; 
+        }
+        .details-table td { 
+            width: 50%; 
+            vertical-align: top; 
+        }
+        .section-title { 
+            color: #9ca3af; 
+            font-size: 10px; 
+            text-transform: uppercase; 
+            margin-bottom: 5px; 
+            font-weight: bold;
+        }
+        
+        /* Items Table */
+        .items-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-bottom: 30px; 
+        }
+        .items-table th { 
+            background: #f3f4f6; 
+            padding: 10px; 
+            text-align: left; 
+            font-size: 11px; 
+            border-bottom: 2px solid #e5e7eb; 
+            text-transform: uppercase;
+        }
+        .items-table td { 
+            padding: 10px; 
+            border-bottom: 1px solid #e5e7eb; 
+        }
+        
+        /* Totals */
+        .totals-table { 
+            width: 300px;
+            margin-left: auto;
+            border-collapse: collapse; 
+        }
+        .totals-table td { 
+            padding: 8px 10px; 
+            text-align: right; 
+        }
+        .grand-total td{ 
+            border-top: 2px solid #0f9d58; 
+            color: #0f9d58; 
+            font-weight: bold; 
+            font-size: 14px; 
+        }
+        
+        /* Footer */
+        .footer { 
+            text-align: center; 
+            color: #9ca3af; 
+            font-size: 10px; 
+            border-top: 1px solid #e5e7eb; 
+            padding-top: 15px; 
+            margin-top: 40px; 
+            clear: both; 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <table class="header-table">
+        <tr>
+            <td>
+                <div class="logo">RumiMart</div>
+                <div style="color: #6b7280;">Your Daily Needs, Delivered.</div>
+            </td>
+            <td style="text-align: right;">
+                <div class="invoice-title">INVOICE</div>
+                <div><strong>Order #:</strong> {{ order.id }}</div>
+                <div><strong>Date:</strong> {{ order.created_at|date:"M d, Y" }} at {{ order.created_at|time:"h:i A" }}</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Details -->
+    <table class="details-table">
+        <tr>
+            <td>
+                <div class="section-title">Billed To:</div>
+                <div style="font-weight: bold; font-size: 13px;">{{ order.first_name }} {{ order.last_name }}</div>
+                <div>{{ order.address }}</div>
+                <div>{{ order.city }} - {{ order.pincode }}</div>
+            </td>
+            <td style="text-align: right;">
+                <div class="section-title">Contact & Payment:</div>
+                <div><strong>Phone:</strong> {{ order.phone }}</div>
+                <div><strong>Email:</strong> {{ order.email }}</div>
+                <div><strong>Payment Method:</strong> {{ order.payment_method }}</div>
+                <div><strong>Status:</strong> <span style="color: #0f9d58;">Paid</span></div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Items -->
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Item Description</th>
+                <th style="text-align: right;">Price</th>
+                <th style="text-align: right;">Qty</th>
+                <th style="text-align: right;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td style="text-align: right;">Rs. {{ item.price }}</td>
+                <td style="text-align: right;">{{ item.quantity }}</td>
+                <td style="text-align: right;">Rs. {{ item.price|floatformat:2 }}</td> 
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Totals -->
+    <table class="totals-table">
+        <tr>
+            <td>Subtotal</td>
+            <td>Rs. {{ subtotal|floatformat:2 }}</td>
+        </tr>
+        {% if order.discount_amount > 0 %}
+        <tr>
+            <td style="color: #0f9d58;">Discount Applied</td>
+            <td style="color: #0f9d58;">- Rs. {{ order.discount_amount|floatformat:2 }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td>Tax</td>
+            <td>Included</td>
+        </tr>
+        <tr class="grand-total">
+            <td>Grand Total</td>
+            <td>Rs. {{ order.total_price|floatformat:2 }}</td>
+        </tr>
+    </table>
+
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Thank you for shopping with RumiMart!</p>
+        <p>If you have any questions, contact us at support@rumimart.com</p>
+    </div>
+
+</body>
+</html>
