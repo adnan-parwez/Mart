@@ -8,14 +8,14 @@
 
     <h1 style="color: #1f2937; margin-bottom: 10px;">Payment Confirmed!</h1>
     <p style="color: #6b7280; font-size: 1.1rem; margin-bottom: 30px;">
-        Thank you, <strong>{{ order.first_name }}</strong>! Your payment for Order <strong>#{{ order.id }}</strong> has been verified.
+        Thank you, <strong>{{ order.first_name }}</strong>! Your payment for Order <strong>#{{ order.order_number }}</strong> has been verified.
     </p>
     
     <div style="background: #f9fafb; border: 1px dashed #d1d5db; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
         <p style="margin: 0; color: #4b5563;">Your order is now being prepared. You can view or download your official invoice below.</p>
     </div>
 
-    <a href="{% url 'order_invoice' order.id %}" style="display: inline-block; background: #0f9d58; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; width: 100%; box-sizing: border-box;">
+    <a href="{% url 'order_invoice' order.order_number %}" style="display: inline-block; background: #0f9d58; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; width: 100%; box-sizing: border-box;">
         📄 Download / View Invoice
     </a>
     
@@ -28,7 +28,7 @@
         <h3 style="margin-top: 0; color: #1f2937; font-size: 1.1rem;">Save your order to an account</h3>
         <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 15px;">Create a password to track this order and checkout faster next time.</p>
         
-        <form method="POST" action="{% url 'set_password_guest' order.id %}">
+        <form method="POST" action="{% url 'set_password_guest' order.order_number %}">
             {% csrf_token %}
             <div style="display: flex; gap: 10px;">
                 <input type="password" name="password" required minlength="8" placeholder="Create a password (min 8 chars)" style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">

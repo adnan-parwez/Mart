@@ -4,14 +4,14 @@
     <div style="font-size: 4rem; margin-bottom: 20px;">⏳</div>
     <h1 style="color: #1f2937;">Payment Under Review</h1>
     <p style="color: #6b7280; font-size: 1.1rem; margin-bottom: 30px;">
-        Thank you, {{ order.first_name }}! We are verifying your payment for Order <strong>#{{ order.id }}</strong>.
+        Thank you, {{ order.first_name }}! We are verifying your payment for Order <strong>#{{ order.order_number }}</strong>.
     </p>
     <p style="color: #6b7280;">
         Once we confirm the payment, an official invoice will be generated and sent to your email (<strong>{{ order.email }}</strong>).
     </p>
     
     <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-        <a href="{% url 'order_status' order.id %}?email={{ order.email|urlencode }}" style="display: inline-block; padding: 12px 24px; background: #0f9d58; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+        <a href="{% url 'order_status' order.order_number %}?email={{ order.email|urlencode }}" style="display: inline-block; padding: 12px 24px; background: #0f9d58; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
             🔄 Refresh Status
         </a>
         <a href="/" style="display: inline-block; padding: 12px 24px; background: #f3f4f6; color: #374151; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid #d1d5db;">

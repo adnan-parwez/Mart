@@ -150,7 +150,7 @@ def checkout(request):
         if delivery_type == 'store_pickup':
             address_str = "STORE PICKUP: RUMI MART"
             city = "Store Pickup"
-            pincode = "000000"
+            pincode = "829202"
         elif address_id and address_id != 'new':
             addr = Address.objects.get(id=address_id)
             address_str = addr.address_line
@@ -244,7 +244,7 @@ def checkout(request):
 
         # Redirect to UPI or Pending
         if request.POST.get('payment_method') == 'UPI':
-            upi_url = f"upi://pay?pa={settings.UPI_ID}&pn={urllib.parse.quote(settings.UPI_NAME)}&am={total_price}&cu=INR&tn=Order_{order.id}"
+            upi_url = f"upi://pay?pa={settings.UPI_ID}&pn={urllib.parse.quote(settings.UPI_NAME)}&am={total_price}&cu=INR&tn=Order_{order.order_number}"
             qr_code_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={urllib.parse.quote(upi_url)}"
             return render(request, 'store/upi_payment.html', {
                 'order': order, 'upi_id': settings.UPI_ID, 'qr_code_url': qr_code_url, 'total_price': total_price
@@ -423,7 +423,7 @@ def confirm_payment_and_send_invoice(request, order_id):
     pdf_file.seek(0)
 
     # 4. Prepare the Premium Email
-    subject = f"🧾 Payment Confirmed - Invoice #{order.id}"
+    subject = f"🧾 Payment Confirmed - Invoice #{order.order_number}"
     html_message = render_to_string('store/email_invoice.html', {'order': order})
     plain_message = strip_tags(html_message)
     
@@ -432,11 +432,11 @@ def confirm_payment_and_send_invoice(request, order_id):
         subject, plain_message, 'adnan.uc3m@gmail.com', [order.email]
     )
     email.attach_alternative(html_message, "text/html")
-    email.attach(f"RumiMart_Invoice_{order.id}.pdf", pdf_file.getvalue(), "application/pdf")
+    email.attach(f"RumiMart_Invoice_{order.order_number}.pdf", pdf_file.getvalue(), "application/pdf")
     
     email.send()
 
-    messages.success(request, f"Order #{order.id} confirmed & PDF invoice sent!")
+    messages.success(request, f"Order #{order.order_number} confirmed & PDF invoice sent!")
     return redirect('dashboard')
 
 def order_success(request, order_id):
