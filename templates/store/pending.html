@@ -1,6 +1,6 @@
 {% extends 'store/base.html' %}
 {% block content %}
-<div style="max-width: 600px; margin: 80px auto; text-align: center; background: white; padding: 50px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+<div style="max-width: 600px; margin: 80px auto; text-align: center; background: white; padding: 50px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
     <div style="font-size: 4rem; margin-bottom: 20px;">⏳</div>
     <h1 style="color: #1f2937;">Payment Under Review</h1>
     <p style="color: #6b7280; font-size: 1.1rem; margin-bottom: 30px;">
@@ -11,15 +11,29 @@
     </p>
     
     <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-        <!-- Refresh Status Button (Passes email to bypass login) -->
         <a href="{% url 'order_status' order.id %}?email={{ order.email|urlencode }}" style="display: inline-block; padding: 12px 24px; background: #0f9d58; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
             🔄 Refresh Status
         </a>
-        
-        <!-- Return to Shop -->
         <a href="/" style="display: inline-block; padding: 12px 24px; background: #f3f4f6; color: #374151; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid #d1d5db;">
             Return to Shop
         </a>
     </div>
+
+    <!-- 👇 CREATE ACCOUNT OPTION (For Guests) 👇 -->
+    {% if not order.user.has_usable_password %}
+    <div style="margin-top: 40px; padding-top: 30px; border-top: 1px dashed #e5e7eb; text-align: left;">
+        <h3 style="margin-top: 0; color: #1f2937; font-size: 1.1rem;">Save your order to an account</h3>
+        <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 15px;">Create a password to track this order and checkout faster next time.</p>
+        
+        <form method="POST" action="{% url 'set_password_guest' order.id %}">
+            {% csrf_token %}
+            <div style="display: flex; gap: 10px;">
+                <input type="password" name="password" required minlength="8" placeholder="Create a password (min 8 chars)" style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+                <button type="submit" style="background: #0f9d58; color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">Save</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}

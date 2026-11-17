@@ -146,7 +146,13 @@
         document.addEventListener("DOMContentLoaded", function() {
             let popupDismissed = sessionStorage.getItem('popup_dismissed');
             let currentUrl = window.location.pathname;
-            let isAuthPage = currentUrl.includes('/login/') || currentUrl.includes('/register/') || currentUrl.includes('/reset/') || currentUrl.includes('/password-reset/');
+            let isAuthPage = currentUrl.includes('/login/') || 
+                             currentUrl.includes('/register/') || 
+                             currentUrl.includes('/reset/') || 
+                             currentUrl.includes('/password-reset/') ||
+                             currentUrl.includes('/order/status/') ||
+                             currentUrl.includes('/set-password/') ||
+                             currentUrl.includes('/invoice/');
             if (!popupDismissed && !isAuthPage) {
                 let modal = document.getElementById('welcome-modal');
                 if (modal) modal.style.display = 'flex';

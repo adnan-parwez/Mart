@@ -2,11 +2,8 @@
 {% block content %}
 <div style="max-width: 600px; margin: 80px auto; text-align: center; background: white; padding: 50px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
     
-    <!-- Green Success Checkmark -->
     <div style="width: 80px; height: 80px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0f9d58" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-        </svg>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0f9d58" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
     </div>
 
     <h1 style="color: #1f2937; margin-bottom: 10px;">Payment Confirmed!</h1>
@@ -15,20 +12,31 @@
     </p>
     
     <div style="background: #f9fafb; border: 1px dashed #d1d5db; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-        <p style="margin: 0; color: #4b5563;">
-            Your order is now being prepared. You can view or download your official invoice below.
-        </p>
+        <p style="margin: 0; color: #4b5563;">Your order is now being prepared. You can view or download your official invoice below.</p>
     </div>
 
-    <!-- Download Invoice Button -->
     <a href="{% url 'order_invoice' order.id %}" style="display: inline-block; background: #0f9d58; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; width: 100%; box-sizing: border-box;">
         📄 Download / View Invoice
     </a>
     
     <br>
-    
-    <a href="/" style="color: #6b7280; text-decoration: none; font-size: 0.95rem;">
-        Return to Shop
-    </a>
+    <a href="/" style="color: #6b7280; text-decoration: none; font-size: 0.95rem;">Return to Shop</a>
+
+    <!-- 👇 CREATE ACCOUNT OPTION (For Guests) 👇 -->
+    {% if not order.user.has_usable_password %}
+    <div style="margin-top: 40px; padding-top: 30px; border-top: 1px dashed #e5e7eb; text-align: left;">
+        <h3 style="margin-top: 0; color: #1f2937; font-size: 1.1rem;">Save your order to an account</h3>
+        <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 15px;">Create a password to track this order and checkout faster next time.</p>
+        
+        <form method="POST" action="{% url 'set_password_guest' order.id %}">
+            {% csrf_token %}
+            <div style="display: flex; gap: 10px;">
+                <input type="password" name="password" required minlength="8" placeholder="Create a password (min 8 chars)" style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
+                <button type="submit" style="background: #0f9d58; color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">Save</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}

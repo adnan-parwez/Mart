@@ -629,10 +629,11 @@ def set_password_guest(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     user = order.user
     
-    # If the user is already logged in as this user, just send them to orders
-    if request.user.is_authenticated and request.user.id == user.id:
-        return redirect('my_orders')
-
+    # If they already have a password, send them to login
+    if user.has_usable_password():
+        messages.info(request, "Your account is already active. Please login.")
+        return redirect('login')
+        
     if request.method == 'POST':
         password = request.POST.get('password')
         if len(password) >= 8:
@@ -644,6 +645,7 @@ def set_password_guest(request, order_id):
         else:
             messages.error(request, "Password must be at least 8 characters.")
             
+    # If they are GETting the page from the email link, show the full page
     return render(request, 'store/set_password.html', {'order': order})
 
 def order_status(request, order_id):
