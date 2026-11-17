@@ -334,5 +334,25 @@
         </div>
     </footer>
 
+        <!-- 👇 ADMIN PENDING ORDER POPUP 👇 -->
+    {% if global_has_pending %}
+    <div id="globalAdminAlert" style="display: none; position: fixed; bottom: 30px; right: 30px; background: #fef3c7; border-left: 6px solid #f59e0b; padding: 20px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 9999; max-width: 320px;">
+        <h4 style="margin: 0 0 10px 0; color: #92400e; font-size: 1.1rem; font-family: sans-serif;">🔔 Admin Attention Needed!</h4>
+        <p style="margin: 0 0 15px 0; color: #78350f; font-size: 0.9rem; font-family: sans-serif;">You have pending payments that need to be verified.</p>
+        
+        <a href="{% url 'pending_orders' %}" style="background: #f59e0b; color: white; padding: 8px 15px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 0.85rem; display: inline-block;">Review Pending Orders</a>
+        <!-- Close button -->
+        <span onclick="document.getElementById('globalAdminAlert').style.display='none';" style="position: absolute; top: 10px; right: 15px; cursor: pointer; color: #b45309; font-weight: bold; font-size: 1.2rem;">&times;</span>
+    </div>
+
+    <script>
+        // Wait 1.5 seconds after the page loads, then pop up
+        setTimeout(function() {
+            document.getElementById('globalAdminAlert').style.display = 'block';
+        }, 1500);
+    </script>
+    {% endif %}
+    <!-- 👆 END ADMIN POPUP 👆 -->
+
 </body>
 </html>

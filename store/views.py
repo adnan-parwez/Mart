@@ -17,6 +17,7 @@ from .forms import ProductForm, CustomUserCreationForm
 from .forms import ProductForm, CustomUserCreationForm, CouponForm
 import io
 from xhtml2pdf import pisa
+from django.db.models import Sum
 # 1. STOREFRONT VIEWS
 # ==========================================
 
@@ -334,6 +335,7 @@ def dashboard(request):
         'total_products': total_products,
         'pending_orders': pending_orders,
         'recent_orders': recent_orders,
+        #'has_pending': pending_orders.exists(),
     })
 
 @staff_member_required
@@ -380,21 +382,34 @@ def pending_page(request, order_id):
     return render(request, 'store/pending.html', {'order': order})
 
 @staff_member_required
+def pending_orders(request):
+    # Only shows unconfirmed orders
+    orders = Order.objects.filter(is_paid=False).order_by('-created_at')
+    return render(request, 'store/pending_orders.html', {'orders': orders})
+
+@staff_member_required
 def manage_orders(request):
-    pending_orders = Order.objects.filter(is_paid=False).order_by('-created_at')
+    # Shows all orders with date filtering
+    orders = Order.objects.all().order_by('-created_at')
     
-    # Get date filter from URL (e.g., ?date=2026-11-17)
     date_filter = request.GET.get('date')
     if date_filter:
-        recent_orders = Order.objects.filter(is_paid=True, created_at__date=date_filter).order_by('-created_at')
-    else:
-        recent_orders = Order.objects.filter(is_paid=True).order_by('-created_at')[:50]
+        orders = orders.filter(created_at__date=date_filter)
+        
+    filtered_revenue = orders.filter(is_paid=True).aggregate(Sum('total_price'))['total_price__sum'] or 0
 
     return render(request, 'store/manage_orders.html', {
-        'pending_orders': pending_orders,
-        'recent_orders': recent_orders,
-        'date_filter': date_filter
+        'orders': orders,
+        'date_filter': date_filter,
+        'filtered_revenue': filtered_revenue
     })
+
+@staff_member_required
+def delete_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    order.delete()
+    messages.success(request, f"Order #{order.order_number} was deleted.")
+    return redirect('manage_orders')
 
 @staff_member_required
 def confirm_payment_and_send_invoice(request, order_id):

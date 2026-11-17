@@ -1,0 +1,53 @@
+{% extends 'store/base.html' %}
+{% block content %}
+{% include 'store/admin_nav.html' %}
+
+<div style="max-width: 1000px; margin: 40px auto; padding: 0 20px; font-family: sans-serif;">
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px;">
+        <h1 style="margin: 0; color: #0f172a; font-size: 2rem; font-weight: 800;">Pending Payments</h1>
+        <span style="background: #fef3c7; color: #92400e; padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold;">{{ orders|length }} Action Required</span>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="background: #dcfce7; color: #166534; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold;">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8fafc; text-align: left; color: #64748b; font-size: 0.85rem;">
+                    <th style="padding: 15px 25px; font-weight: 600;">Order No</th>
+                    <th style="padding: 15px 25px; font-weight: 600;">Customer Info</th>
+                    <th style="padding: 15px 25px; font-weight: 600;">Amount</th>
+                    <th style="padding: 15px 25px; font-weight: 600;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 20px 25px; font-weight: bold; color: #0f172a;">#{{ order.order_number }}</td>
+                    <td style="padding: 20px 25px;">
+                        <div style="font-weight: bold; color: #0f172a;">{{ order.first_name }}</div>
+                        <div style="color: #64748b; font-size: 0.85rem;">{{ order.email }}</div>
+                        <div style="color: #64748b; font-size: 0.85rem;">{{ order.payment_method }}</div>
+                    </td>
+                    <td style="padding: 20px 25px; font-weight: bold; color: #0f172a;">₹{{ order.total_price }}</td>
+                    <td style="padding: 20px 25px;">
+                        <a href="{% url 'confirm_payment' order.id %}" style="background: #0f9d58; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(15,157,88,0.2);">Confirm & Send Invoice</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="padding: 40px; text-align: center; color: #64748b;">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">🎉</div>
+                        You are all caught up! No pending payments.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

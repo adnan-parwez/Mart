@@ -51,6 +51,10 @@ urlpatterns = [
     path('dashboard/coupons/add/', views.add_coupon, name='add_coupon'),
     path('dashboard/coupons/edit/<int:coupon_id>/', views.edit_coupon, name='edit_coupon'),
     path('dashboard/coupons/delete/<int:coupon_id>/', views.delete_coupon, name='delete_coupon'),
+    path('dashboard/orders/delete/<int:order_id>/', views.delete_order, name='delete_order'),
+    path('dashboard/orders/pending/', views.pending_orders, name='pending_orders'),
+    path('dashboard/orders/', views.manage_orders, name='manage_orders'),
+    path('dashboard/orders/delete/<int:order_id>/', views.delete_order, name='delete_order'),
 
     # Profile & Wishlist
     path('profile/', views.profile, name='profile'),

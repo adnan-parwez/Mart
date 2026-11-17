@@ -147,21 +147,4 @@ class Coupon(models.Model):
         if self.discount_type == 'percentage':
             return f"{self.code} - {self.discount_value}% off"
         return f"{self.code} - ₹{self.discount_value} off"
-    
-from django import forms
-from .models import Coupon
-
-class CouponForm(forms.ModelForm):
-    class Meta:
-        model = Coupon
-        fields = ['code', 'discount_type', 'discount_value', 'minimum_order_value', 'active', 'valid_from', 'valid_to']
-        widgets = {
-            'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g. RUMI10'}),
-            'discount_type': forms.Select(attrs={'class': 'form-control'}),
-            'discount_value': forms.NumberInput(attrs={'class': 'form-control'}),
-            'minimum_order_value': forms.NumberInput(attrs={'class': 'form-control'}),
-            'valid_from': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
-            'valid_to': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
-        }
-
 
