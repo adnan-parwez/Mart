@@ -73,31 +73,45 @@ class Product(models.Model):
         return 0
 
 # 3. Order Model
-from django.db import models
-from django.utils import timezone
-
 class Order(models.Model):
-    # ... your existing fields ...
     order_number = models.CharField(max_length=20, blank=True)
-    
+
+    # --- Customer / shipping ---
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='orders'
+    )
+    first_name = models.CharField(max_length=100, blank=True)
+    last_name = models.CharField(max_length=100, blank=True)
+    email = models.EmailField(blank=True)
+    phone = models.CharField(max_length=15, blank=True)
+
+    address = models.TextField(blank=True)         # store pickup uses a long string
+    city = models.CharField(max_length=100, blank=True)
+    pincode = models.CharField(max_length=10, blank=True)
+
+    # --- Payment ---
+    payment_method = models.CharField(max_length=50, blank=True)
+    is_paid = models.BooleanField(default=False)
+
+    # --- Totals ---
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
     def save(self, *args, **kwargs):
         if not self.order_number:
-            # Generate date string: DDMMYYYY
             today = timezone.now().strftime('%d%m%Y')
-            
-            # Find the last order created today
-            last_order = Order.objects.filter(order_number__startswith=today).order_by('-order_number').first()
-            
-            if last_order:
-                # Extract the last 3 digits, add 1
-                last_sequence = int(last_order.order_number[-3:])
-                new_sequence = last_sequence + 1
-            else:
-                new_sequence = 1
-                
-            # Combine: 17112026 + 001
+            last_order = Order.objects.filter(
+                order_number__startswith=today
+            ).order_by('-order_number').first()
+            new_sequence = (
+                int(last_order.order_number[-3:]) + 1 if last_order else 1
+            )
             self.order_number = f"{today}{new_sequence:03d}"
-            
         super().save(*args, **kwargs)
 
     def __str__(self):
