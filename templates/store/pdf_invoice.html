@@ -154,34 +154,34 @@
             {% endfor %}
         </tbody>
     </table>
-
-    <!-- Totals -->
-    <table class="totals-table">
+    <!-- Grand Total Summary -->
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <!-- Subtotal -->
         <tr>
-            <td>Subtotal</td>
-            <td>Rs. {{ subtotal|floatformat:2 }}</td>
+            <td style="text-align: right; padding: 5px; color: #333;">Subtotal:</td>
+            <td style="text-align: right; padding: 5px; width: 100px;">₹{{ order.total_price|add:order.discount_amount|floatformat:2 }}</td>
         </tr>
-        {% if order.discount_amount > 0 %}
-        <tr>
-            <td style="color: #0f9d58;">Discount Applied</td>
-            <td style="color: #0f9d58;">- Rs. {{ order.discount_amount|floatformat:2 }}</td>
-        </tr>
-        {% endif %}
 
+        <!-- Delivery Charge -->
         {% if delivery_fee > 0 %}
         <tr>
-            <td colspan="3" style="text-align: right;"><strong>Delivery Charge:</strong></td>
-            <td>₹{{ delivery_fee }}</td>
+            <td style="text-align: right; padding: 5px; color: #333;">Delivery Charge:</td>
+            <td style="text-align: right; padding: 5px;">₹{{ delivery_fee|floatformat:2 }}</td>
         </tr>
         {% endif %}
-        
+
+        <!-- Discount -->
+        {% if order.discount_amount > 0 %}
         <tr>
-            <td>Tax</td>
-            <td>Included</td>
+            <td style="text-align: right; padding: 5px; color: #0f9d58;">Discount Applied:</td>
+            <td style="text-align: right; padding: 5px; color: #0f9d58;">- ₹{{ order.discount_amount|floatformat:2 }}</td>
         </tr>
-        <tr class="grand-total">
-            <td>Grand Total</td>
-            <td>Rs. {{ order.total_price|floatformat:2 }}</td>
+        {% endif %}
+
+        <!-- Grand Total (with a top border) -->
+        <tr>
+            <td style="text-align: right; padding: 10px 5px; font-weight: bold; font-size: 16px; border-top: 2px solid #0f9d58; color: #0f9d58;">Grand Total:</td>
+            <td style="text-align: right; padding: 10px 5px; font-weight: bold; font-size: 16px; border-top: 2px solid #0f9d58; color: #0f9d58;">₹{{ order.total_price|floatformat:2 }}</td>
         </tr>
     </table>
 
