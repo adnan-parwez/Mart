@@ -1,138 +1,243 @@
 <style>
-    /* Container for the whole header */
-    .admin-header-wrapper {
-        background: #ffffff;
-        border-bottom: 1px solid #e2e8f0;
-        padding: 15px 40px;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    /* Reset and Base Font */
+    .pos-layout { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    
+    /* Force the body to not have margins */
+    body { margin: 0; padding: 0; overflow-x: hidden; background: #f8fafc; }
+
+    /* Hide any potential website headers and footers */
+    header, nav, footer, .navbar, .header { display: none !important; }
+    
+    /* The main layout grid */
+    .pos-layout { 
         display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        min-height: 100vh;
+        width: 100%;
+    }
+    
+    /* Force the sidebar to the absolute left */
+    .pos-sidebar {
+        width: 260px;
+        background: #0f172a;
+        color: #94a3b8;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+        z-index: 1000;
     }
 
-    /* The Logo / Brand */
-    .admin-brand {
+    /* Sidebar Brand */
+    .pos-brand {
+        padding: 30px 24px;
         display: flex;
         align-items: center;
         gap: 12px;
         text-decoration: none;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        transition: background 0.2s;
     }
-    .brand-icon {
+    .pos-brand:hover { background: rgba(255,255,255,0.03); }
+    
+    .pos-brand-icon {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
         width: 38px;
         height: 38px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 10px;
+        font-size: 1.3rem;
         font-weight: 900;
-        font-size: 1.2rem;
-        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
     }
-    .brand-text {
-        color: #0f172a;
+    .pos-brand-text {
+        color: white;
         font-size: 1.25rem;
         font-weight: 800;
         letter-spacing: -0.5px;
     }
-    .brand-text span {
-        color: #0f9d58;
-    }
+    .pos-brand-text span { color: #10b981; }
 
-    /* Navigation Links */
-    .admin-nav-links {
+    /* Sidebar Navigation */
+    .pos-menu {
+        padding: 24px 16px;
         display: flex;
+        flex-direction: column;
         gap: 8px;
-        background: #f1f5f9;
-        padding: 6px;
-        border-radius: 12px;
+        flex: 1;
+        overflow-y: auto;
     }
-    .admin-nav-links a {
-        text-decoration: none;
+    .pos-menu-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        font-weight: 700;
         color: #64748b;
-        font-weight: 600;
-        font-size: 0.9rem;
-        padding: 10px 18px;
-        border-radius: 8px;
-        transition: all 0.3s ease;
+        margin: 15px 0 5px 12px;
+    }
+    .pos-menu a {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 12px;
+        padding: 12px 16px;
+        color: #cbd5e1;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
     }
-    .admin-nav-links a:hover {
-        color: #0f172a;
-        background: #e2e8f0;
+    .pos-menu a:hover {
+        background: rgba(255,255,255,0.05);
+        color: white;
     }
-    .admin-nav-links a.active {
-        background: #ffffff;
-        color: #0f9d58;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    .pos-menu a.active {
+        background: #10b981;
+        color: white;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
 
-    /* Right side buttons */
-    .admin-nav-actions {
+    /* Main Content Wrapper */
+    .pos-main-wrapper {
+        margin-left: 260px;
+        width: calc(100% - 260px);
+        min-height: 100vh;
         display: flex;
-        gap: 15px;
-        align-items: center;
+        flex-direction: column;
+        background: #f8fafc;
     }
-    .btn-django {
-        background: #0f172a;
-        color: white;
+
+    /* Top Header */
+    .pos-topbar {
+        background: white;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        border-bottom: 1px solid #e2e8f0;
+        position: sticky;
+        top: 0;
+        z-index: 900;
+    }
+    .pos-page-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0;
+    }
+    .pos-topbar-actions { display: flex; align-items: center; gap: 20px; }
+    .btn-django-admin {
+        background: white;
+        color: #0f172a;
         text-decoration: none;
-        padding: 10px 20px;
+        padding: 8px 16px;
         border-radius: 8px;
         font-weight: 600;
         font-size: 0.9rem;
+        border: 1px solid #e2e8f0;
         transition: all 0.2s;
     }
-    .btn-django:hover {
-        background: #1e293b;
-        transform: translateY(-2px);
+    .btn-django-admin:hover { background: #f1f5f9; }
+    .admin-avatar {
+        width: 36px; height: 36px; background: #0f9d58; color: white;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-weight: bold;
+    }
+
+    /* 👇 THIS MAKES SURE EVERY ADMIN PAGE IS 100% FULL WIDTH 👇 */
+    .pos-content { 
+        padding: 40px; 
+        flex: 1; 
+        width: 100%;
+        box-sizing: border-box; /* Prevents padding from causing overflow */
     }
     
-    /* Responsive */
-    @media (max-width: 1024px) {
-        .admin-header-wrapper { flex-direction: column; gap: 15px; padding: 15px 20px; }
-        .admin-nav-links { flex-wrap: wrap; justify-content: center; }
+    /* Force inner containers to fill the space */
+    .admin-page-container {
+        width: 100%;
+        max-width: 100% !important;
+        margin: 0 !important;
     }
 </style>
 
-<div class="admin-header-wrapper">
-    <!-- Logo -->
-    <a href="{% url 'dashboard' %}" class="admin-brand">
-        <div class="brand-icon">R</div>
-        <div class="brand-text">Rumi<span>Mart</span> POS</div>
-    </a>
+<div class="pos-layout">
+    <!-- SIDEBAR -->
+    <aside class="pos-sidebar">
+        <a href="{% url 'shop' %}" class="pos-brand">
+            <div class="pos-brand-icon">R</div>
+            <div class="pos-brand-text">Rumi<span>Mart</span></div>
+        </a>
 
-    <!-- Pill Buttons -->
-    <div class="admin-nav-links">
-        <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-            📊 Overview
-        </a>
-        <a href="{% url 'pending_orders' %}" class="{% if request.resolver_match.url_name == 'pending_orders' %}active{% endif %}">
-            ⏳ Pending
-        </a>
-        <a href="{% url 'manage_orders' %}" class="{% if request.resolver_match.url_name == 'manage_orders' %}active{% endif %}">
-            💳 All Orders
-        </a>
-        <a href="{% url 'manage_products' %}" class="{% if request.resolver_match.url_name == 'manage_products' %}active{% endif %}">
-            📦 Inventory
-        </a>
-        <a href="{% url 'manage_customers' %}" class="{% if request.resolver_match.url_name == 'manage_customers' %}active{% endif %}">
-            👥 Customers
-        </a>
-        <a href="{% url 'manage_coupons' %}" class="{% if request.resolver_match.url_name == 'manage_coupons' %}active{% endif %}">
-            🎟️ Coupons
-        </a>
-    </div>
+        <div class="pos-menu">
+            <div class="pos-menu-label">Main Menu</div>
+            
+            <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Overview
+            </a>
+            
+            <a href="{% url 'pending_orders' %}" class="{% if request.resolver_match.url_name == 'pending_orders' %}active{% endif %}">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Pending Orders
+            </a>
 
-    <!-- Django Admin Button -->
-    <div class="admin-nav-actions">
-        <a href="/admin/" class="btn-django">Django Admin →</a>
-    </div>
-</div>
+            <a href="{% url 'manage_orders' %}" class="{% if request.resolver_match.url_name == 'manage_orders' %}active{% endif %}">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                All Orders
+            </a>
+
+            <div class="pos-menu-label" style="margin-top: 20px;">Management</div>
+
+            <a href="{% url 'manage_products' %}" class="{% if request.resolver_match.url_name == 'manage_products' %}active{% endif %}">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                Inventory
+            </a>
+
+            <a href="{% url 'manage_customers' %}" class="{% if request.resolver_match.url_name == 'manage_customers' %}active{% endif %}">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                Customers
+            </a>
+
+            <a href="{% url 'manage_coupons' %}" class="{% if request.resolver_match.url_name == 'manage_coupons' %}active{% endif %}">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
+                Coupons
+            </a>
+        </div>
+
+        <!-- 👇 NEW: GO TO STORE BUTTON AT BOTTOM OF SIDEBAR 👇 -->
+        <div style="padding: 20px 16px; border-top: 1px solid rgba(255,255,255,0.05);">
+            <a href="{% url 'shop' %}" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #1e293b; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: background 0.2s;" onmouseover="this.style.background='#334155'" onmouseout="this.style.background='#1e293b'">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Go to Store
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="pos-main-wrapper">
+        
+        <header class="pos-topbar">
+            <h1 class="pos-page-title">
+                {% if request.resolver_match.url_name == 'dashboard' %}Overview
+                {% elif request.resolver_match.url_name == 'pending_orders' %}Pending Orders
+                {% elif request.resolver_match.url_name == 'manage_orders' %}Order History
+                {% elif request.resolver_match.url_name == 'manage_products' %}Inventory Management
+                {% elif request.resolver_match.url_name == 'manage_customers' %}Customers
+                {% elif request.resolver_match.url_name == 'manage_coupons' %}Coupons
+                {% else %}Admin Panel{% endif %}
+            </h1>
+
+            <div class="pos-topbar-actions">
+                <a href="/admin/" class="btn-django-admin">⚙️ Django Admin</a>
+                <div class="admin-avatar">A</div>
+            </div>
+        </header>
+
+        <main class="pos-content">

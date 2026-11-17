@@ -2,65 +2,79 @@
 {% block content %}
 {% include 'store/admin_nav.html' %}
 
-<div style="max-width: 1200px; margin: 40px auto; padding: 0 20px; font-family: sans-serif;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+<!-- 👇 CHANGED: Full width container, removed max-width limit 👇 -->
+<<div style="width: 100%; margin: 0; font-family: sans-serif;">
+    
+    <!-- Action Banner (if pending) -->
+    {% if pending_orders %}
+    <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
         <div>
-            <h1 style="margin: 0; color: #0f172a; font-size: 2rem; font-weight: 800;">Dashboard Overview</h1>
-            <p style="color: #64748b; margin-top: 5px;">Welcome back. Here's what's happening today.</p>
+            <h3 style="margin: 0; color: #92400e; font-size: 1.1rem;">Action Needed</h3>
+            <p style="margin: 5px 0 0 0; color: #b45309; font-size: 0.9rem;">You have {{ pending_orders|length }} pending orders waiting to be confirmed.</p>
         </div>
-        {% if pending_orders %}
-            <a href="{% url 'pending_orders' %}" style="background: #f59e0b; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 12px rgba(245,158,11,0.3);">Action Needed: {{ pending_orders|length }} Pending Orders</a>
-        {% endif %}
+        <a href="{% url 'pending_orders' %}" style="background: #f59e0b; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 12px rgba(245,158,11,0.3);">Review Pending Orders</a>
+    </div>
+    {% endif %}
+
+    <!-- Stats Grid (Stretches across the full width) -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; margin-bottom: 30px;">
+        <div style="background: white; padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+            <h3 style="margin: 0 0 10px 0; color: #64748b; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total Revenue</h3>
+            <p style="margin: 0; font-size: 2.2rem; font-weight: 800; color: #0f172a;">₹{{ total_revenue }}</p>
+        </div>
+        <div style="background: white; padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+            <h3 style="margin: 0 0 10px 0; color: #64748b; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total Orders</h3>
+            <p style="margin: 0; font-size: 2.2rem; font-weight: 800; color: #0f172a;">{{ total_orders }}</p>
+        </div>
+        <div style="background: white; padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+            <h3 style="margin: 0 0 10px 0; color: #64748b; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Customers</h3>
+            <p style="margin: 0; font-size: 2.2rem; font-weight: 800; color: #0f172a;">{{ total_customers }}</p>
+        </div>
+        <div style="background: white; padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+            <h3 style="margin: 0 0 10px 0; color: #64748b; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Products</h3>
+            <p style="margin: 0; font-size: 2.2rem; font-weight: 800; color: #0f172a;">{{ total_products }}</p>
+        </div>
     </div>
 
-    <!-- Stats Grid -->
-    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; margin-bottom: 40px;">
-        <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-            <h3 style="margin: 0 0 10px 0; color: #64748b; font-size: 0.9rem; font-weight: 600;">Total Revenue</h3>
-            <p style="margin: 0; font-size: 2.5rem; font-weight: 800; color: #0f172a;">₹{{ total_revenue }}</p>
-        </div>
-        <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-            <h3 style="margin: 0 0 10px 0; color: #64748b; font-size: 0.9rem; font-weight: 600;">Total Orders</h3>
-            <p style="margin: 0; font-size: 2.5rem; font-weight: 800; color: #0f172a;">{{ total_orders }}</p>
-        </div>
-        <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-            <h3 style="margin: 0 0 10px 0; color: #64748b; font-size: 0.9rem; font-weight: 600;">Customers</h3>
-            <p style="margin: 0; font-size: 2.5rem; font-weight: 800; color: #0f172a;">{{ total_customers }}</p>
-        </div>
-        <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-            <h3 style="margin: 0 0 10px 0; color: #64748b; font-size: 0.9rem; font-weight: 600;">Products</h3>
-            <p style="margin: 0; font-size: 2.5rem; font-weight: 800; color: #0f172a;">{{ total_products }}</p>
-        </div>
-    </div>
-
-    <!-- Recent Orders -->
-    <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
-        <div style="padding: 25px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
-            <h3 style="margin: 0; color: #0f172a; font-size: 1.2rem;">Recently Confirmed Orders</h3>
+    <!-- Recent Orders Panel (Also stretches full width) -->
+    <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); width: 100%;">
+        <div style="padding: 20px 25px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
+            <h3 style="margin: 0; color: #0f172a; font-size: 1.1rem;">Recently Confirmed Orders</h3>
             <a href="{% url 'manage_orders' %}" style="color: #0f9d58; text-decoration: none; font-weight: bold; font-size: 0.9rem;">View All →</a>
         </div>
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
-                <tr style="background: #f8fafc; text-align: left; color: #64748b; font-size: 0.85rem;">
-                    <th style="padding: 15px 25px; font-weight: 600;">Order No</th>
-                    <th style="padding: 15px 25px; font-weight: 600;">Customer</th>
-                    <th style="padding: 15px 25px; font-weight: 600;">Amount</th>
-                    <th style="padding: 15px 25px; font-weight: 600;">Status</th>
+                <tr style="background: white; text-align: left; color: #64748b; font-size: 0.85rem;">
+                    <th style="padding: 15px 25px; font-weight: 600; border-bottom: 1px solid #e2e8f0;">Order No</th>
+                    <th style="padding: 15px 25px; font-weight: 600; border-bottom: 1px solid #e2e8f0;">Customer</th>
+                    <th style="padding: 15px 25px; font-weight: 600; border-bottom: 1px solid #e2e8f0;">Amount</th>
+                    <th style="padding: 15px 25px; font-weight: 600; border-bottom: 1px solid #e2e8f0;">Status</th>
                 </tr>
             </thead>
             <tbody>
                 {% for order in recent_orders %}
-                <tr style="border-bottom: 1px solid #f1f5f9;">
+                <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='white'">
                     <td style="padding: 15px 25px; font-weight: bold; color: #0f172a;">#{{ order.order_number }}</td>
                     <td style="padding: 15px 25px; color: #334155;">{{ order.first_name }}</td>
                     <td style="padding: 15px 25px; font-weight: bold; color: #0f172a;">₹{{ order.total_price }}</td>
-                    <td style="padding: 15px 25px;"><span style="background: #dcfce7; color: #166534; padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">✓ Paid</span></td>
+                    <td style="padding: 15px 25px;">
+                        <span style="background: #dcfce7; color: #166534; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold;">✓ Paid</span>
+                    </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="4" style="padding: 30px; text-align: center; color: #64748b;">No recent orders.</td></tr>
+                <tr>
+                    <td colspan="4" style="padding: 40px; text-align: center; color: #64748b;">
+                        No recent orders found.
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- 👇 THESE TAGS ARE REQUIRED TO CLOSE THE NEW SIDEBAR LAYOUT 👇 -->
+        </main> 
+    </div> 
+</div> 
 {% endblock %}

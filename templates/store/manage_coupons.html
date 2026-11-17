@@ -1,7 +1,11 @@
 {% extends 'store/base.html' %}
 {% block content %}
+{% include 'store/admin_nav.html' %}
+
+<div style="width: 100%; margin: 0; font-family: sans-serif;">
 <style>
-    .table-container { max-width: 1000px; margin: 40px auto; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; overflow: hidden; }
+    /* 👇 REMOVED max-width so it fills the screen 👇 */
+    .table-container { width: 100%; margin: 0; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; overflow: hidden; }
     .table-header { display: flex; justify-content: space-between; align-items: center; padding: 25px 30px; border-bottom: 1px solid #e5e7eb; background: #f9fafb; }
     .table-header h2 { margin: 0; color: #1f2937; font-size: 1.5rem; }
     
@@ -77,4 +81,10 @@
         </tbody>
     </table>
 </div>
+</div>
+
+<!-- 👇 CLOSING TAGS FOR THE SIDEBAR LAYOUT 👇 -->
+        </main> 
+    </div> 
+</div> 
 {% endblock %}
