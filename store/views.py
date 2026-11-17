@@ -407,10 +407,15 @@ def confirm_payment_and_send_invoice(request, order_id):
     # 2. Calculate Subtotal for the PDF
     subtotal = float(order.total_price) + float(order.discount_amount)
 
-    # 3. Generate the PDF
+    # 3. Calculate Delivery Fee
+    price_before_delivery = subtotal - float(order.discount_amount)
+    delivery_fee = 10 if price_before_delivery < 500 else 0
+
+    # 4. Generate the PDF
     html_string = render_to_string('store/pdf_invoice.html', {
         'order': order,
-        'subtotal': subtotal # 👈 Passing subtotal to fix the ₹0 bug
+        'subtotal': subtotal,
+        'delivery_fee': delivery_fee  # 👈 Pass to PDF
     })
     
     pdf_file = io.BytesIO()
@@ -422,12 +427,18 @@ def confirm_payment_and_send_invoice(request, order_id):
         
     pdf_file.seek(0)
 
-    # 4. Prepare the Premium Email
+    # 5. Prepare the Premium Email
     subject = f"🧾 Payment Confirmed - Invoice #{order.order_number}"
-    html_message = render_to_string('store/email_invoice.html', {'order': order})
+    
+    # 👇 Pass delivery_fee and subtotal to the Email too!
+    html_message = render_to_string('store/email_invoice.html', {
+        'order': order,
+        'subtotal': subtotal,
+        'delivery_fee': delivery_fee
+    })
     plain_message = strip_tags(html_message)
     
-    # 5. Send Email
+    # 6. Send Email
     email = EmailMultiAlternatives(
         subject, plain_message, 'adnan.uc3m@gmail.com', [order.email]
     )
@@ -481,7 +492,16 @@ def order_invoice(request, order_id):
         messages.warning(request, "Payment is still pending verification.")
         return redirect('shop')
         
-    return render(request, 'store/invoice.html', {'order': order})
+    # 👇 ADD THESE LINES TO CALCULATE THE FEE 👇
+    subtotal = float(order.total_price) + float(order.discount_amount)
+    price_before_delivery = subtotal - float(order.discount_amount)
+    delivery_fee = 10 if price_before_delivery < 500 else 0
+
+    # 👇 PASS IT TO THE TEMPLATE 👇
+    return render(request, 'store/invoice.html', {
+        'order': order,
+        'delivery_fee': delivery_fee 
+    })
 
 @login_required(login_url='/login/')
 def profile(request):

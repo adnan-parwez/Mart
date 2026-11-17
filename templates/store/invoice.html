@@ -103,13 +103,20 @@
             </tbody>
         </table>
 
-        <!-- Totals -->
-        <!-- Totals -->
+              <!-- Totals -->
         <div class="totals">
             <div class="total-row">
                 <span>Subtotal</span>
                 <span>₹{{ order.total_price|add:order.discount_amount }}</span> <!-- Shows original price -->
             </div>
+
+            <!-- 👇 FIXED DELIVERY CHARGE SECTION 👇 -->
+            {% if delivery_fee > 0 %}
+            <div class="total-row">
+                <span>Delivery Charge</span>
+                <span>₹{{ delivery_fee|floatformat:2 }}</span>
+            </div>
+            {% endif %}
             
             {% if order.discount_amount > 0 %}
             <div class="total-row" style="color: #0f9d58; font-weight: bold;">

@@ -51,7 +51,7 @@
             <table class="data-table">
                 <tr>
                     <td style="color: #6b7280;">Order ID:</td>
-                    <td style="text-align: right; font-weight: bold;">#{{ order.id }}</td>
+                    <td style="text-align: right; font-weight: bold;">#{{ order.order_number }}</td>
                 </tr>
                 <tr>
                     <td style="color: #6b7280;">Date:</td>
@@ -82,10 +82,15 @@
                     {% endfor %}
                 </tbody>
             </table>
-
             <!-- Grand Total -->
             <div class="summary-box">
                 <table class="summary-table">
+                     {% if delivery_fee > 0 %}
+                    <tr>
+                        <td style="color: #6b7280;">Delivery Charge:</td>
+                        <td style="text-align: right; color: #6b7280;">₹{{ delivery_fee|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
                     {% if order.discount_amount > 0 %}
                     <tr>
                         <td style="color: #0f9d58;">Discount:</td>

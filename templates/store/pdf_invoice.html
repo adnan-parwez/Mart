@@ -108,7 +108,7 @@
             </td>
             <td style="text-align: right;">
                 <div class="invoice-title">INVOICE</div>
-                <div><strong>Order #:</strong> {{ order.id }}</div>
+                <div><strong>Order #:</strong> {{ order.order_number }}</div>
                 <div><strong>Date:</strong> {{ order.created_at|date:"M d, Y" }} at {{ order.created_at|time:"h:i A" }}</div>
             </td>
         </tr>
@@ -167,6 +167,14 @@
             <td style="color: #0f9d58;">- Rs. {{ order.discount_amount|floatformat:2 }}</td>
         </tr>
         {% endif %}
+
+        {% if delivery_fee > 0 %}
+        <tr>
+            <td colspan="3" style="text-align: right;"><strong>Delivery Charge:</strong></td>
+            <td>₹{{ delivery_fee }}</td>
+        </tr>
+        {% endif %}
+        
         <tr>
             <td>Tax</td>
             <td>Included</td>
