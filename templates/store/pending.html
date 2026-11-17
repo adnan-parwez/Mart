@@ -11,7 +11,7 @@
     </p>
     
     <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-        <a href="{% url 'order_status' order.order_number %}?email={{ order.email|urlencode }}" style="display: inline-block; padding: 12px 24px; background: #0f9d58; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+        <a href="{% url 'order_status' order.id %}?email={{ order.email|urlencode }}" style="display: inline-block; padding: 12px 24px; background: #0f9d58; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
             🔄 Refresh Status
         </a>
         <a href="/" style="display: inline-block; padding: 12px 24px; background: #f3f4f6; color: #374151; text-decoration: none; border-radius: 8px; font-weight: bold; border: 1px solid #d1d5db;">
