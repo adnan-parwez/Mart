@@ -15,7 +15,7 @@
         <p style="margin: 0; color: #4b5563;">Your order is now being prepared. You can view or download your official invoice below.</p>
     </div>
 
-    <a href="{% url 'order_invoice' order.order_number %}" style="display: inline-block; background: #0f9d58; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; width: 100%; box-sizing: border-box;">
+    <a href="{% url 'order_invoice' order.id %}" style="display: inline-block; background: #0f9d58; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1rem; margin-bottom: 15px; width: 100%; box-sizing: border-box;">
         📄 Download / View Invoice
     </a>
     
