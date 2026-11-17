@@ -16,6 +16,7 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('success/<int:order_id>/', views.order_success, name='order_success'),
     path('pending/<int:order_id>/', views.pending_page, name='pending_page'),
+    path('profile/address/delete/<int:address_id>/', views.delete_address, name='delete_address'),
     
     # 👇 MAKE SURE THIS LINE HAS A COMMA AT THE END 👇
     path('order/status/<int:order_id>/', views.order_status, name='order_status'),

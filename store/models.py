@@ -73,23 +73,36 @@ class Product(models.Model):
         return 0
 
 # 3. Order Model
+from django.db import models
+from django.utils import timezone
+
 class Order(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
-    email = models.EmailField()
-    phone = models.CharField(max_length=15, blank=True) # Added phone
-    address = models.CharField(max_length=250)
-    city = models.CharField(max_length=100, blank=True)
-    pincode = models.CharField(max_length=10, blank=True)
-    payment_method = models.CharField(max_length=50, default="Cash on Delivery")
-    created_at = models.DateTimeField(auto_now_add=True)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    is_paid = models.BooleanField(default=False)
-    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    # ... your existing fields ...
+    order_number = models.CharField(max_length=20, blank=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.order_number:
+            # Generate date string: DDMMYYYY
+            today = timezone.now().strftime('%d%m%Y')
+            
+            # Find the last order created today
+            last_order = Order.objects.filter(order_number__startswith=today).order_by('-order_number').first()
+            
+            if last_order:
+                # Extract the last 3 digits, add 1
+                last_sequence = int(last_order.order_number[-3:])
+                new_sequence = last_sequence + 1
+            else:
+                new_sequence = 1
+                
+            # Combine: 17112026 + 001
+            self.order_number = f"{today}{new_sequence:03d}"
+            
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Order {self.id} - {self.first_name}"
+        return f"Order {self.order_number} - {self.first_name}"
+
 
 # 4. Order Item Model
 class OrderItem(models.Model):
@@ -135,3 +148,5 @@ class CouponForm(forms.ModelForm):
             'valid_from': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
             'valid_to': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
         }
+
+

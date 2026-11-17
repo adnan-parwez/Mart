@@ -20,6 +20,27 @@
                 <label style="font-size: 0.85rem; color: #6b7280; font-weight: 600;">Phone Number</label>
                 <p style="margin: 5px 0 0 0; font-size: 1.1rem;">{{ user.phone|default:"Not provided" }}</p>
             </div>
+            <!-- Add this below the profile details -->
+            <div style="margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin: 0; color: #1f2937;">Saved Addresses</h3>
+                    <a href="{% url 'edit_profile' %}" style="color: #0f9d58; font-weight: bold; text-decoration: none; font-size: 0.9rem;">Add New Address</a>
+                </div>
+                
+                {% for address in user.addresses.all %}
+                <div style="background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>{{ address.full_name }}</strong><br>
+                        {{ address.address_line }}, {{ address.city }} - {{ address.pincode }}<br>
+                        <small style="color: #6b7280;">📞 {{ address.phone }}</small>
+                    </div>
+                    <a href="{% url 'delete_address' address.id %}" style="color: #ef4444; text-decoration: none; font-size: 0.85rem;" onclick="return confirm('Delete this address?')">Remove</a>
+                </div>
+                {% empty %}
+                <p style="color: #6b7280; font-size: 0.9rem;">No saved addresses yet.</p>
+                {% endfor %}
+            </div>
+            
         </div>
         
         <div style="border-top: 1px solid #e5e7eb; margin-top: 30px; padding-top: 20px;">

@@ -381,12 +381,19 @@ def pending_page(request, order_id):
 
 @staff_member_required
 def manage_orders(request):
-    # Get all orders that are NOT paid yet
     pending_orders = Order.objects.filter(is_paid=False).order_by('-created_at')
-    paid_orders = Order.objects.filter(is_paid=True).order_by('-created_at')[:10]
+    
+    # Get date filter from URL (e.g., ?date=2026-11-17)
+    date_filter = request.GET.get('date')
+    if date_filter:
+        recent_orders = Order.objects.filter(is_paid=True, created_at__date=date_filter).order_by('-created_at')
+    else:
+        recent_orders = Order.objects.filter(is_paid=True).order_by('-created_at')[:50]
+
     return render(request, 'store/manage_orders.html', {
         'pending_orders': pending_orders,
-        'paid_orders': paid_orders
+        'recent_orders': recent_orders,
+        'date_filter': date_filter
     })
 
 @staff_member_required
@@ -661,3 +668,11 @@ def order_status(request, order_id):
     else:
         messages.error(request, "Unauthorized access. Please use the link from your email.")
         return redirect('shop')
+
+@login_required(login_url='/login/')
+def delete_address(request, address_id):
+    address = get_object_or_404(Address, id=address_id, user=request.user)
+    address.delete()
+    messages.success(request, "Address removed successfully!")
+    return redirect('profile')
+

@@ -1,13 +1,15 @@
 {% extends 'store/base.html' %}
 {% block content %}
-<div style="display: flex; gap: 30px; margin-top: 40px;">
-    <!-- Sidebar (Reuse your dashboard sidebar) -->
-    <div style="width: 250px; background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px 0; height: fit-content;">
+<div style="display: flex; gap: 30px; margin-top: 40px; max-width: 1400px; margin-left: auto; margin-right: auto; padding: 0 20px;">
+    
+    <!-- Sidebar -->
+    <div style="width: 250px; background: white; border-radius: 12px; border: 1px solid #e5e7eb; padding: 20px 0; height: fit-content; flex-shrink: 0;">
         <a href="{% url 'dashboard' %}" style="display: block; padding: 12px 20px; color: #4b5563; text-decoration: none; font-weight: 600;">📊 Overview</a>
         <a href="{% url 'manage_products' %}" style="display: block; padding: 12px 20px; color: #4b5563; text-decoration: none; font-weight: 600;">📦 Inventory</a>
         <a href="{% url 'manage_orders' %}" style="display: block; padding: 12px 20px; background: #f0fdf4; color: #0f9d58; text-decoration: none; font-weight: 600; border-left: 4px solid #0f9d58;">💳 Orders & Payments</a>
     </div>
 
+    <!-- Main Content -->
     <div style="flex: 1;">
         <h1 style="margin-top: 0; color: #1f2937;">Payment Verification</h1>
         
@@ -19,6 +21,7 @@
             {% endfor %}
         {% endif %}
 
+        <!-- 1. PENDING PAYMENTS CARD -->
         <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden; margin-bottom: 40px;">
             <div style="padding: 20px; border-bottom: 1px solid #e5e7eb; background: #fef3c7;">
                 <h3 style="margin: 0; color: #92400e;">Pending Payments (Check your UPI App)</h3>
@@ -35,7 +38,7 @@
                 <tbody>
                     {% for order in pending_orders %}
                     <tr>
-                        <td style="padding: 15px 20px; border-bottom: 1px solid #eee;"><strong>#{{ order.id }}</strong></td>
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #eee;"><strong>#{{ order.order_number }}</strong></td>
                         <td style="padding: 15px 20px; border-bottom: 1px solid #eee;">{{ order.first_name }}<br><span style="font-size: 0.8rem; color: #666;">{{ order.email }}</span></td>
                         <td style="padding: 15px 20px; border-bottom: 1px solid #eee;"><strong>₹{{ order.total_price }}</strong></td>
                         <td style="padding: 15px 20px; border-bottom: 1px solid #eee;">
@@ -49,19 +52,42 @@
             </table>
         </div>
 
+        <!-- 2. DATE FILTER (Moved here, outside the pending card) -->
+        <div style="margin-bottom: 20px;">
+            <form method="GET" style="display: flex; gap: 10px; background: white; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                <input type="date" name="date" value="{{ date_filter|default:'' }}" style="padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                <button type="submit" style="background: #1f2937; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">Filter by Date</button>
+                {% if date_filter %}
+                    <a href="{% url 'manage_orders' %}" style="padding: 10px 20px; background: #f3f4f6; color: #374151; border-radius: 6px; text-decoration: none; font-weight: 600; border: 1px solid #d1d5db;">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- 3. RECENTLY CONFIRMED ORDERS CARD -->
         <div style="background: white; border-radius: 12px; border: 1px solid #e5e7eb; overflow: hidden;">
             <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
                 <h3 style="margin: 0; color: #1f2937;">Recently Confirmed Orders</h3>
             </div>
             <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="text-align: left; padding: 15px 20px; background: #f9fafb;">Order ID</th>
+                        <th style="text-align: left; padding: 15px 20px; background: #f9fafb;">Customer</th>
+                        <th style="text-align: left; padding: 15px 20px; background: #f9fafb;">Amount</th>
+                        <th style="text-align: left; padding: 15px 20px; background: #f9fafb;">Status</th>
+                    </tr>
+                </thead>
                 <tbody>
                     {% for order in paid_orders %}
                     <tr>
-                        <td style="padding: 15px 20px; border-bottom: 1px solid #eee;">#{{ order.id }}</td>
+                        <!-- FIXED: Using order_number instead of id -->
+                        <td style="padding: 15px 20px; border-bottom: 1px solid #eee;"><strong>#{{ order.order_number }}</strong></td>
                         <td style="padding: 15px 20px; border-bottom: 1px solid #eee;">{{ order.first_name }}</td>
                         <td style="padding: 15px 20px; border-bottom: 1px solid #eee;">₹{{ order.total_price }}</td>
                         <td style="padding: 15px 20px; border-bottom: 1px solid #eee;"><span style="color: #0f9d58; font-weight: bold;">✓ Paid</span></td>
                     </tr>
+                    {% empty %}
+                    <tr><td colspan="4" style="padding: 20px; text-align: center; color: #666;">No confirmed orders yet.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
