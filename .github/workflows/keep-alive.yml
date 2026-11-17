@@ -8,4 +8,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Render
-        run: curl -s https://your-app.onrender.com > /dev/null
+        run: curl -s https://mart-q2d5.onrender.com > /dev/null
